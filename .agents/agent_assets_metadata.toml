@@ -1,0 +1,62 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "Rmea-cqGRhJBfhLMhAHzJ"
+uri = "file://artifacts/auto-parts/src/assets/images/hero.png"
+type = "image"
+title = "Industrial auto parts workshop"
+
+[[generated]]
+id = "KMkDg2QFy1Z6sYGmmeQWW"
+uri = "file://artifacts/auto-parts/src/assets/images/axle-shaft.png"
+type = "image"
+title = "Used axle shaft on white"
+
+[[generated]]
+id = "K-A5XTNFj2QIdkItBhWQd"
+uri = "file://artifacts/auto-parts/src/assets/images/drive-shaft.png"
+type = "image"
+title = "Drive shaft on white"
+
+[[generated]]
+id = "xxA4MDC8WfpUCLQGQr0fI"
+uri = "file://artifacts/auto-parts/src/assets/images/differential.png"
+type = "image"
+title = "Car differential on white"
+
+[[generated]]
+id = "n6KNEMkRkV5GG6WtczBxL"
+uri = "file://artifacts/auto-parts/src/assets/images/speedometer.png"
+type = "image"
+title = "Speedometer cluster on white"
+
+[[generated]]
+id = "EWZ3DAofPS4uiixnrjLJY"
+uri = "file://artifacts/auto-parts/src/assets/images/throttle-body.png"
+type = "image"
+title = "Throttle body on white"
+
+[[generated]]
+id = "-C-yb4Ua6PQ8Dqhh4NM1y"
+uri = "file://artifacts/auto-parts/src/assets/images/transfer-case.png"
+type = "image"
+title = "Transfer case assembly on white"
+
+[[generated]]
+id = "QaSSgQoYhz8nJaRK_Kuuc"
+uri = "file://artifacts/auto-parts/src/assets/images/steering-rack.png"
+type = "image"
+title = "Steering rack on white"
+
+[[generated]]
+id = "2Rx9PK_qQ37xsZ1rmZMSD"
+uri = "file://artifacts/auto-parts/src/assets/images/intake-manifold.png"
+type = "image"
+title = "Intake manifold on white"
+
+[[generated]]
+id = "pwJoz2yOeu6fBgbv6iZZI"
+uri = "file://artifacts/auto-parts/src/assets/images/steering-column.png"
+type = "image"
+title = "Steering column on white"
