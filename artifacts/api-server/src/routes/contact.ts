@@ -1,46 +1,49 @@
 import { Router, type IRouter } from "express";
+import { db, contactsTable } from "@workspace/db";
+import { CreateContactBody } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
-interface ContactEntry {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  email: string;
-  message?: string;
-  receivedAt: string;
-}
+router.post("/contact", async (req, res) => {
+  const result = CreateContactBody.safeParse(req.body);
 
-const contacts: ContactEntry[] = [];
-
-router.post("/contact", (req, res) => {
-  const { firstName, lastName, phone, email, message } = req.body as Record<string, string>;
-
-  if (!firstName || !lastName || !phone || !email) {
-    res.status(400).json({ error: "First name, last name, phone, and email are required." });
+  if (!result.success) {
+    const firstError = result.error.issues[0];
+    res.status(400).json({
+      error: firstError
+        ? `${firstError.path.join(".")}: ${firstError.message}`
+        : "Invalid request body.",
+    });
     return;
   }
 
-  if (!email.includes("@")) {
-    res.status(400).json({ error: "Invalid email address." });
-    return;
-  }
+  const data = result.data;
 
-  const entry: ContactEntry = {
-    firstName: String(firstName).trim(),
-    lastName: String(lastName).trim(),
-    phone: String(phone).trim(),
-    email: String(email).trim().toLowerCase(),
-    message: message ? String(message).trim() : undefined,
-    receivedAt: new Date().toISOString(),
-  };
+  const [inserted] = await db
+    .insert(contactsTable)
+    .values({
+      firstName: data.firstName.trim(),
+      lastName: data.lastName.trim(),
+      phone: data.phone.trim(),
+      email: data.email.trim().toLowerCase(),
+      message: data.message?.trim() ?? null,
+    })
+    .returning();
 
-  contacts.push(entry);
-  req.log.info({ email: entry.email, name: `${entry.firstName} ${entry.lastName}` }, "New contact form submission");
-  res.json({ success: true, message: "Thank you! We will contact you shortly." });
+  req.log.info(
+    { id: inserted.id, email: inserted.email, name: `${inserted.firstName} ${inserted.lastName}` },
+    "New contact form submission saved to DB",
+  );
+
+  res.json({
+    success: true,
+    message: "Thank you! We will contact you shortly.",
+    id: inserted.id,
+  });
 });
 
-router.get("/contacts", (_req, res) => {
+router.get("/contacts", async (_req, res) => {
+  const contacts = await db.select().from(contactsTable).orderBy(contactsTable.createdAt);
   res.json({ contacts, total: contacts.length });
 });
 

@@ -8,32 +8,42 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Phone, Mail, MapPin, Clock, CheckCircle2 } from "lucide-react";
 import heroImg from "@/assets/images/hero.png";
 import { products } from "@/lib/products";
-
-const API_BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+import { useCreateContact } from "@workspace/api-client-react";
 
 export default function ContactUs() {
-  const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", email: "", partNeeded: "", message: "" });
-  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    partNeeded: "",
+    message: "",
+  });
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
+  const [submittedContact, setSubmittedContact] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
+  const mutation = useCreateContact({
+    mutation: {
+      onSuccess: () => {
+        setSubmitted(true);
+        setSubmittedContact(form.phone || form.email);
+      },
+    },
+  });
+
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitting(true);
-    setError("");
-    try {
-      const res = await fetch(`${API_BASE}/api/contact`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName: form.firstName, lastName: form.lastName, phone: form.phone, email: form.email, message: `Part needed: ${form.partNeeded}\n\n${form.message}` }),
-      });
-      if (!res.ok) throw new Error("Failed to submit");
-      setSubmitted(true);
-    } catch {
-      setError("Something went wrong. Please call us directly at 1385 688 3299.");
-    } finally {
-      setSubmitting(false);
-    }
+    mutation.mutate({
+      data: {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        phone: form.phone,
+        email: form.email,
+        message: form.partNeeded
+          ? `Part needed: ${form.partNeeded}\n\n${form.message}`
+          : form.message || undefined,
+      },
+    });
   }
 
   return (
@@ -51,8 +61,12 @@ export default function ContactUs() {
           </div>
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-2xl">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-4 leading-tight">Contact Us</h1>
-              <p className="text-xl text-gray-200 font-medium">Get the lowest prices on used auto parts — we're here to help!</p>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-4 leading-tight">
+                Contact Us
+              </h1>
+              <p className="text-xl text-gray-200 font-medium">
+                Get the lowest prices on used auto parts — we're here to help!
+              </p>
             </div>
           </div>
         </section>
@@ -73,7 +87,12 @@ export default function ContactUs() {
                   </div>
                   <h3 className="font-bold text-gray-900 mb-2">{card.title}</h3>
                   {card.lines.map((line, j) => (
-                    <p key={j} className={j === 0 ? "text-[#0099cc] font-semibold text-sm" : "text-gray-500 text-xs mt-1"}>{line}</p>
+                    <p
+                      key={j}
+                      className={j === 0 ? "text-[#0099cc] font-semibold text-sm" : "text-gray-500 text-xs mt-1"}
+                    >
+                      {line}
+                    </p>
                   ))}
                 </div>
               ))}
@@ -87,35 +106,72 @@ export default function ContactUs() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 max-w-6xl mx-auto">
               {/* Main Contact Form */}
               <div className="lg:col-span-2">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2 border-l-4 border-[#0099cc] pl-4">Send Us a Message</h2>
-                <p className="text-gray-600 mb-8">Fill out the form below and one of our parts specialists will contact you shortly.</p>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2 border-l-4 border-[#0099cc] pl-4">
+                  Send Us a Message
+                </h2>
+                <p className="text-gray-600 mb-8">
+                  Fill out the form below and one of our parts specialists will contact you shortly.
+                </p>
 
                 {submitted ? (
                   <div className="bg-green-50 border border-green-200 rounded-2xl p-12 text-center">
                     <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h3>
-                    <p className="text-gray-600">Thank you! One of our specialists will contact you shortly at <strong>{form.phone || form.email}</strong>.</p>
+                    <p className="text-gray-600">
+                      Thank you! One of our specialists will contact you shortly at{" "}
+                      <strong>{submittedContact}</strong>.
+                    </p>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div className="space-y-2">
                         <Label htmlFor="cf-firstName">First Name *</Label>
-                        <Input id="cf-firstName" required value={form.firstName} onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))} className="bg-gray-50 border-gray-200 h-11" placeholder="John" />
+                        <Input
+                          id="cf-firstName"
+                          required
+                          value={form.firstName}
+                          onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))}
+                          className="bg-gray-50 border-gray-200 h-11"
+                          placeholder="John"
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="cf-lastName">Last Name *</Label>
-                        <Input id="cf-lastName" required value={form.lastName} onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))} className="bg-gray-50 border-gray-200 h-11" placeholder="Smith" />
+                        <Input
+                          id="cf-lastName"
+                          required
+                          value={form.lastName}
+                          onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))}
+                          className="bg-gray-50 border-gray-200 h-11"
+                          placeholder="Smith"
+                        />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div className="space-y-2">
                         <Label htmlFor="cf-phone">Phone Number *</Label>
-                        <Input id="cf-phone" type="tel" required value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className="bg-gray-50 border-gray-200 h-11" placeholder="(555) 000-0000" />
+                        <Input
+                          id="cf-phone"
+                          type="tel"
+                          required
+                          value={form.phone}
+                          onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                          className="bg-gray-50 border-gray-200 h-11"
+                          placeholder="(555) 000-0000"
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="cf-email">Email Address *</Label>
-                        <Input id="cf-email" type="email" required value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className="bg-gray-50 border-gray-200 h-11" placeholder="john@example.com" />
+                        <Input
+                          id="cf-email"
+                          type="email"
+                          required
+                          value={form.email}
+                          onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                          className="bg-gray-50 border-gray-200 h-11"
+                          placeholder="john@example.com"
+                        />
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -125,18 +181,37 @@ export default function ContactUs() {
                           <SelectValue placeholder="Select a part category" />
                         </SelectTrigger>
                         <SelectContent>
-                          {products.map(p => <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>)}
+                          {products.map(p => (
+                            <SelectItem key={p.id} value={p.name}>
+                              {p.name}
+                            </SelectItem>
+                          ))}
                           <SelectItem value="other">Other / Not Listed</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="cf-message">Message</Label>
-                      <Textarea id="cf-message" rows={5} value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} className="bg-gray-50 border-gray-200 resize-none" placeholder="Tell us your vehicle make, model, year and the part you need..." />
+                      <Textarea
+                        id="cf-message"
+                        rows={5}
+                        value={form.message}
+                        onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+                        className="bg-gray-50 border-gray-200 resize-none"
+                        placeholder="Tell us your vehicle make, model, year and the part you need..."
+                      />
                     </div>
-                    {error && <p className="text-red-600 text-sm">{error}</p>}
-                    <Button type="submit" disabled={submitting} className="w-full h-12 text-base font-bold bg-[#0099cc] hover:bg-[#007da6] text-white shadow-md">
-                      {submitting ? "Sending..." : "Send Message"}
+                    {mutation.isError && (
+                      <p className="text-red-600 text-sm">
+                        Something went wrong. Please call us directly at 1385 688 3299.
+                      </p>
+                    )}
+                    <Button
+                      type="submit"
+                      disabled={mutation.isPending}
+                      className="w-full h-12 text-base font-bold bg-[#0099cc] hover:bg-[#007da6] text-white shadow-md"
+                    >
+                      {mutation.isPending ? "Sending..." : "Send Message"}
                     </Button>
                   </form>
                 )}
@@ -147,8 +222,13 @@ export default function ContactUs() {
                 <div className="bg-gray-900 rounded-2xl p-8 text-center text-white">
                   <Phone className="h-12 w-12 text-[#0099cc] mx-auto mb-4" />
                   <h3 className="text-xl font-bold mb-2">Call Us Directly</h3>
-                  <p className="text-gray-400 text-sm mb-5">Skip the form and speak with a parts specialist right now.</p>
-                  <a href="tel:13856883299" className="inline-flex items-center justify-center gap-2 bg-[#0099cc] text-white px-6 py-3 rounded-full text-xl font-black hover:bg-[#007da6] transition-colors w-full">
+                  <p className="text-gray-400 text-sm mb-5">
+                    Skip the form and speak with a parts specialist right now.
+                  </p>
+                  <a
+                    href="tel:13856883299"
+                    className="inline-flex items-center justify-center gap-2 bg-[#0099cc] text-white px-6 py-3 rounded-full text-xl font-black hover:bg-[#007da6] transition-colors w-full"
+                  >
                     1385 688 3299
                   </a>
                 </div>
@@ -156,7 +236,13 @@ export default function ContactUs() {
                 <div className="bg-[#EBF7FF] rounded-2xl p-8">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Why Call Us?</h3>
                   <ul className="space-y-3 text-gray-600 text-sm">
-                    {["Instant price quotes", "Check part availability in real-time", "Expert advice from automotive specialists", "Arrange same-day shipping", "30-day warranty on every part"].map((item, i) => (
+                    {[
+                      "Instant price quotes",
+                      "Check part availability in real-time",
+                      "Expert advice from automotive specialists",
+                      "Arrange same-day shipping",
+                      "30-day warranty on every part",
+                    ].map((item, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <CheckCircle2 className="h-4 w-4 text-[#0099cc] mt-0.5 flex-shrink-0" />
                         {item}
@@ -168,9 +254,18 @@ export default function ContactUs() {
                 <div className="bg-white border border-gray-200 rounded-2xl p-8">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Business Hours</h3>
                   <div className="space-y-2 text-sm text-gray-600">
-                    <div className="flex justify-between"><span>Monday – Friday</span><span className="font-semibold text-gray-900">8:00am – 6:00pm</span></div>
-                    <div className="flex justify-between"><span>Saturday</span><span className="font-semibold text-gray-900">9:00am – 4:00pm</span></div>
-                    <div className="flex justify-between"><span>Sunday</span><span className="font-semibold text-gray-500">Closed</span></div>
+                    <div className="flex justify-between">
+                      <span>Monday – Friday</span>
+                      <span className="font-semibold text-gray-900">8:00am – 6:00pm</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Saturday</span>
+                      <span className="font-semibold text-gray-900">9:00am – 4:00pm</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Sunday</span>
+                      <span className="font-semibold text-gray-500">Closed</span>
+                    </div>
                   </div>
                 </div>
               </div>
