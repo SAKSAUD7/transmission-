@@ -23,7 +23,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <nav className="hidden md:flex items-center gap-6">
             <Link href="/" className={`text-sm font-medium hover:text-[#0099cc] transition-colors ${location === '/' ? 'text-[#0099cc]' : 'text-gray-600'}`}>Home</Link>
             <Link href="/about" className={`text-sm font-medium hover:text-[#0099cc] transition-colors ${location === '/about' ? 'text-[#0099cc]' : 'text-gray-600'}`}>About Us</Link>
-            <Link href="/" className={`text-sm font-medium hover:text-[#0099cc] transition-colors ${location.startsWith('/product') ? 'text-[#0099cc]' : 'text-gray-600'}`}>Parts Catalog</Link>
+            <Link href="/catalog" className={`text-sm font-medium hover:text-[#0099cc] transition-colors ${location === '/catalog' ? 'text-[#0099cc]' : 'text-gray-600'}`}>Parts Catalog</Link>
             <Link href="/contact" className={`text-sm font-medium hover:text-[#0099cc] transition-colors ${location === '/contact' ? 'text-[#0099cc]' : 'text-gray-600'}`}>Contact Us</Link>
           </nav>
 
@@ -122,7 +122,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <ul className="space-y-2 text-sm text-gray-400">
               <li><Link href="/" className="hover:text-[#0099cc] transition-colors">Home</Link></li>
               <li><Link href="/about" className="hover:text-[#0099cc] transition-colors">About Us</Link></li>
-              <li><Link href="/" className="hover:text-[#0099cc] transition-colors">Parts Catalog</Link></li>
+              <li><Link href="/catalog" className="hover:text-[#0099cc] transition-colors">Parts Catalog</Link></li>
               <li><Link href="/contact" className="hover:text-[#0099cc] transition-colors">Contact Us</Link></li>
             </ul>
           </div>

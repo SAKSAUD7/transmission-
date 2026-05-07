@@ -1,0 +1,4 @@
+artifacts/auto-parts/public/videos/engine.mp4 filter=lfs diff=lfs merge=lfs -text
+artifacts/auto-parts/public/videos/parts2.mp4 filter=lfs diff=lfs merge=lfs -text
+attached_assets/WhatsApp_Video_2026-05-07_at_5.28.19_PM_1778155249222.mp4 filter=lfs diff=lfs merge=lfs -text
+attached_assets/Как_устроен_автомобильный_двигатель_(online-video-cutter.com)__1778155249224.mp4 filter=lfs diff=lfs merge=lfs -text

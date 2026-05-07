@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import AboutUs from "@/pages/AboutUs";
 import ContactUs from "@/pages/ContactUs";
+import PartsCatalog from "@/pages/PartsCatalog";
 import { ProductRoute, products } from "@/lib/products";
 
 const queryClient = new QueryClient();
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/about" component={AboutUs} />
       <Route path="/contact" component={ContactUs} />
+      <Route path="/catalog" component={PartsCatalog} />
       
       {/* Generate routes for all products */}
       {products.map(product => (
