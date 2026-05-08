@@ -47,3 +47,11 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Large binary / media files (exceed GitHub 100 MB limit)
+*.fig
+backups/
+apps/api/media/
+apps/web/public/videos/*.mp4
+# Russian-named engine video
+*.mp4

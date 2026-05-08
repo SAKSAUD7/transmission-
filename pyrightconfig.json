@@ -1,0 +1,15 @@
+{
+  "include": [
+    "apps/api"
+  ],
+  "exclude": [
+    "apps/api/venv",
+    "node_modules"
+  ],
+  "pythonVersion": "3.11",
+  "pythonPlatform": "Windows",
+  "venvPath": "apps/api",
+  "venv": "venv",
+  "reportMissingImports": "warning",
+  "reportMissingModuleSource": "none"
+}
