@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
         source: "/api/:path*",
         destination: "http://127.0.0.1:8000/api/:path*",
       },
+      {
+        // Proxy Django media files (360° videos, thumbnails)
+        source: "/media/:path*",
+        destination: "http://127.0.0.1:8000/media/:path*",
+      },
     ];
   },
 };

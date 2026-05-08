@@ -1,9 +1,7 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { RotateCw, Expand } from "lucide-react";
-
-const API = "http://localhost:8000";
 
 interface AssetResult {
   found: boolean;
@@ -25,7 +23,8 @@ async function fetchAsset(make: string, model: string, assetType: "car" | "part"
   if (!make) return { found: false };
   try {
     const params = new URLSearchParams({ make, model, asset_type: assetType, part_slug: partSlug });
-    const res = await fetch(`${API}/api/vehicles/360/?${params}`);
+    // Use relative URL — Next.js proxies /api/* → Django in dev, Nginx proxies in prod
+    const res = await fetch(`/api/vehicles/360/?${params}`);
     if (!res.ok) return { found: false };
     return await res.json();
   } catch {
@@ -38,10 +37,12 @@ export default function VehicleCreative({ make, model, year, partType, partSlug,
   const [partAsset,    setPartAsset]    = useState<AssetResult>({ found: false });
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const showPart   = !!partType && partAsset.found;
-  const active     = showPart ? partAsset : carAsset;
-  const hasVideo   = active.found && !!active.videoUrl;
-  const videoSrc   = hasVideo ? `${API}${active.videoUrl}` : null;
+  const showPart = !!partType && partAsset.found;
+  const active   = showPart ? partAsset : carAsset;
+  const hasVideo = active.found && !!active.videoUrl;
+
+  // Use relative URL — /media/* is proxied by Next.js in dev, Nginx in prod
+  const videoSrc = hasVideo ? active.videoUrl! : null;
 
   useEffect(() => {
     if (!make) { setCarAsset({ found: false }); return; }
@@ -73,7 +74,13 @@ export default function VehicleCreative({ make, model, year, partType, partSlug,
         </>
       ) : make ? (
         <>
-          <Image src={partImage || "/images/hero.png"} alt={`${make} ${model}`} fill style={{ objectFit: "contain", padding: 24 }} />
+          <Image
+            src={partImage || "/images/hero.png"}
+            alt={`${make} ${model || "vehicle"}`}
+            fill
+            style={{ objectFit: "contain", padding: 24 }}
+            priority
+          />
           <div className="vc-badge vc-badge-dim">
             <RotateCw size={11} /> 360°
           </div>
@@ -83,7 +90,12 @@ export default function VehicleCreative({ make, model, year, partType, partSlug,
         </>
       ) : (
         <>
-          <Image src="/images/hero.png" alt="Select a vehicle" fill style={{ objectFit: "cover", opacity: 0.25 }} />
+          <Image
+            src="/images/hero.png"
+            alt="Select a vehicle"
+            fill
+            style={{ objectFit: "cover", opacity: 0.25 }}
+          />
           <div className="vc-placeholder">
             <div className="vc-placeholder-icon">
               <RotateCw size={22} color="rgba(255,255,255,0.35)" />

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, CheckCircle } from "lucide-react";
 import { CAR_MAKES, CAR_MODELS_BY_MAKE, YEARS } from "@/data/vehicles";
@@ -22,8 +22,27 @@ export default function LeadFormSection({
   const [model,    setModel]    = useState("");
   const [year,     setYear]     = useState("");
   const [partType, setPartType] = useState("");
-  const models    = make ? (CAR_MODELS_BY_MAKE[make] || []) : [];
+
+  // ── Dynamic model loading: API first, static fallback ─────────────────────
+  const [apiModels,     setApiModels]     = useState<string[]>([]);
+  const [modelsLoading, setModelsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!make) { setApiModels([]); return; }
+    setModelsLoading(true);
+    fetch(`/api/vehicles/models/?make=${encodeURIComponent(make)}`)
+      .then(r => r.json())
+      .then((data: { id: number; name: string }[]) => {
+        setApiModels(Array.isArray(data) && data.length > 0 ? data.map(m => m.name) : []);
+      })
+      .catch(() => setApiModels([]))
+      .finally(() => setModelsLoading(false));
+  }, [make]);
+
+  // API models take priority; fall back to static data
+  const models    = apiModels.length > 0 ? apiModels : (make ? (CAR_MODELS_BY_MAKE[make] || []) : []);
   const partImage = getPartImage(partSlug);
+
 
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ fullName: "", phone: "", email: "", zip: "" });
@@ -70,8 +89,15 @@ export default function LeadFormSection({
 
             <div>
               <label className="lead-label">Select Vehicle Model</label>
-              <select className="lead-select" value={model} onChange={e => setModel(e.target.value)} disabled={!make}>
-                <option value="">Select Vehicle Model</option>
+              <select
+                className="lead-select"
+                value={model}
+                onChange={e => setModel(e.target.value)}
+                disabled={!make || modelsLoading}
+              >
+                <option value="">
+                  {modelsLoading ? "Loading models…" : "Select Vehicle Model"}
+                </option>
                 {models.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
             </div>
