@@ -30,14 +30,14 @@ const PARTNERS = [
     tagline: "Expect the Unexpected",
     bg: "#1a1a1a", text: "#f5c842",
     desc: "Lamborghini is an Italian luxury automaker known for its high-performance sports cars with striking, aggressive designs. The brand combines advanced engineering with exclusive styling to deliver an outstanding driving experience.",
-    abbr: "🐂",
+    abbr: "LB",
   },
   {
     name: "AUDI",
     tagline: "Vorsprung durch Technik",
     bg: "#444", text: "#fff",
     desc: "Audi represents the pinnacle of German engineering — precision, performance, and luxury in every component. Audi parts are crafted to exacting tolerances for unmatched reliability and safety.",
-    abbr: "◯◯",
+    abbr: "Au",
   },
   {
     name: "MAHINDRA",
@@ -56,10 +56,10 @@ const PARTNERS = [
 ];
 
 export default function PartnersSection() {
-  const [active, setActive] = useState(3); // Lamborghini as default (matches design)
+  const [active, setActive] = useState(3);
 
-  const prev = () => setActive(a => (a - 1 + PARTNERS.length) % PARTNERS.length);
-  const next = () => setActive(a => (a + 1) % PARTNERS.length);
+  const prev     = () => setActive(a => (a - 1 + PARTNERS.length) % PARTNERS.length);
+  const next     = () => setActive(a => (a + 1) % PARTNERS.length);
   const featured = PARTNERS[active];
 
   return (
@@ -86,8 +86,9 @@ export default function PartnersSection() {
                   className="partner-abbr"
                   style={{
                     color:    i === active ? p.text : "#374151",
-                    fontSize: p.abbr.length > 2 ? 20 : p.abbr.length === 1 ? 22 : 13,
+                    fontSize: 15,
                     fontWeight: 900,
+                    letterSpacing: "0.5px",
                   }}
                 >
                   {p.abbr}
@@ -117,6 +118,13 @@ export default function PartnersSection() {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.28 }}
           >
+            {/* Tagline pill */}
+            <span
+              className="partners-feat-pill"
+              style={{ background: `${featured.bg}15`, color: featured.bg, border: `1px solid ${featured.bg}30` }}
+            >
+              {featured.tagline}
+            </span>
             <h3 className="partners-feat-name">{featured.name}</h3>
             <p className="partners-feat-desc">{featured.desc}</p>
           </motion.div>

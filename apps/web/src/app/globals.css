@@ -86,7 +86,7 @@ body  { font-family: 'Inter', sans-serif; color: var(--text-primary); background
 
 /* ── Contact Modal ──────────────────────────────────────────────────────────── */
 .modal-backdrop    { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 999; backdrop-filter: blur(4px); }
-.modal-box         { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 1000; width: min(400px,92vw); background: #fff; border-radius: 16px; box-shadow: 0 24px 64px rgba(0,0,0,0.3); padding: 28px 28px 32px; }
+.modal-box         { position: relative; width: min(420px,92vw); background: #fff; border-radius: 16px; box-shadow: 0 24px 64px rgba(0,0,0,0.3); padding: 28px 28px 32px; }
 .modal-close       { position: absolute; top: 14px; right: 14px; width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--border); background: #f9fafb; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
 .modal-close:hover { background: #fee2e2; }
 .modal-title       { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; padding-right: 28px; line-height: 1.3; }

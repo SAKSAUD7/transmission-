@@ -5,6 +5,7 @@ import { X, CheckCircle } from "lucide-react";
 import { CAR_MAKES, CAR_MODELS_BY_MAKE, YEARS } from "@/data/vehicles";
 import { getPartImage } from "@/data/vehicleImages";
 import VehicleCreative from "@/components/ui/VehicleCreative";
+import { postLead } from "@/lib/api";
 
 interface LeadFormProps {
   title: string;
@@ -37,17 +38,13 @@ export default function LeadFormSection({
     e.preventDefault();
     setStatus("loading");
     try {
-      const res = await fetch("http://localhost:8000/api/leads/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: form.fullName, phone: form.phone,
-          email: form.email, zip: form.zip,
-          carMake: make, carModel: model, carYear: year,
-          partSlug, partType: partType || partSlug, sourcePage,
-        }),
+      const ok = await postLead({
+        fullName: form.fullName, phone: form.phone,
+        email: form.email, zip: form.zip,
+        carMake: make, carModel: model, carYear: year,
+        partSlug, partType: partType || partSlug, sourcePage,
       });
-      setStatus(res.ok || res.status === 201 ? "success" : "error");
+      setStatus(ok ? "success" : "error");
     } catch {
       setStatus("error");
     }
@@ -103,79 +100,99 @@ export default function LeadFormSection({
         </div>
       </div>
 
-      {/* ── Contact Modal ── */}
+      {/* ── Contact Modal ──
+          FIX: Use a flex wrapper for centering instead of CSS transform,
+          because framer-motion overwrites the `transform` property entirely,
+          breaking the CSS translate(-50%,-50%) centering trick.
+      */}
       <AnimatePresence>
         {modalOpen && (
           <>
-            <motion.div key="bd"
+            {/* Backdrop */}
+            <motion.div
+              key="bd"
               className="modal-backdrop"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }} onClick={closeModal}
+              transition={{ duration: 0.2 }}
+              onClick={closeModal}
             />
-            <motion.div key="modal"
-              className="modal-box"
-              initial={{ opacity: 0, scale: 0.88, y: 24 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 16 }}
-              transition={{ type: "spring", stiffness: 360, damping: 28 }}
-              onClick={e => e.stopPropagation()}
+
+            {/* Centering wrapper — not animated, just flexbox */}
+            <div
+              style={{
+                position: "fixed", inset: 0, zIndex: 1000,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                padding: "16px", pointerEvents: "none",
+              }}
             >
-              <button className="modal-close" onClick={closeModal}>
-                <X size={13} color="#6b7280" />
-              </button>
+              <motion.div
+                key="modal"
+                style={{ pointerEvents: "auto", width: "min(420px, 100%)" }}
+                initial={{ opacity: 0, scale: 0.88, y: 24 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 16 }}
+                transition={{ type: "spring", stiffness: 360, damping: 28 }}
+                onClick={e => e.stopPropagation()}
+              >
+                <div className="modal-box" style={{ position: "relative" }}>
+                  <button className="modal-close" onClick={closeModal}>
+                    <X size={13} color="#6b7280" />
+                  </button>
 
-              {status === "success" ? (
-                <div className="modal-success">
-                  <CheckCircle size={52} color="#16a34a" style={{ margin: "0 auto 14px", display: "block" }} />
-                  <h3 style={{ fontSize: 18, fontWeight: 800, color: "#111827", marginBottom: 8 }}>Request Submitted!</h3>
-                  <p style={{ color: "#6b7280", fontSize: 13, lineHeight: 1.6 }}>
-                    Our team will contact you within 24 hours with the best price.
-                  </p>
-                  <button className="modal-success-btn" onClick={closeModal}>Close</button>
-                </div>
-              ) : (
-                <>
-                  <h2 className="modal-title">Please Enter Your Contact Details</h2>
-
-                  {(make || model || year) && (
-                    <div className="modal-vehicle-tag">
-                      🚗 {[make, model, year].filter(Boolean).join(" · ")}
+                  {status === "success" ? (
+                    <div className="modal-success">
+                      <CheckCircle size={52} color="#16a34a" style={{ margin: "0 auto 14px", display: "block" }} />
+                      <h3 style={{ fontSize: 18, fontWeight: 800, color: "#111827", marginBottom: 8 }}>Request Submitted!</h3>
+                      <p style={{ color: "#6b7280", fontSize: 13, lineHeight: 1.6 }}>
+                        Our team will contact you within 24 hours with the best price.
+                      </p>
+                      <button className="modal-success-btn" onClick={closeModal}>Close</button>
                     </div>
+                  ) : (
+                    <>
+                      <h2 className="modal-title">Please Enter Your Contact Details</h2>
+
+                      {(make || model || year) && (
+                        <div className="modal-vehicle-tag">
+                          🚗 {[make, model, year].filter(Boolean).join(" · ")}
+                        </div>
+                      )}
+
+                      <form className="modal-form" onSubmit={handleSubmit}>
+                        <div>
+                          <label className="lead-label">Full Name</label>
+                          <input className="modal-input" placeholder="Enter Your Full Name" required
+                            value={form.fullName} onChange={set("fullName")} />
+                        </div>
+                        <div>
+                          <label className="lead-label">Phone Number</label>
+                          <input className="modal-input" type="tel" placeholder="Enter Your Phone Number" required
+                            value={form.phone} onChange={set("phone")} />
+                        </div>
+                        <div>
+                          <label className="lead-label">Email Address</label>
+                          <input className="modal-input" type="email" placeholder="Enter Your Email Address" required
+                            value={form.email} onChange={set("email")} />
+                        </div>
+                        <div>
+                          <label className="lead-label">Zip Code</label>
+                          <input className="modal-input" placeholder="Enter Your Zip Code"
+                            value={form.zip} onChange={set("zip")} />
+                        </div>
+
+                        {status === "error" && (
+                          <p className="modal-error">Connection error. Please try again or call us directly.</p>
+                        )}
+
+                        <button type="submit" className="modal-submit" disabled={status === "loading"}>
+                          {status === "loading" ? "Submitting…" : "Get My Free Quote"}
+                        </button>
+                      </form>
+                    </>
                   )}
-
-                  <form className="modal-form" onSubmit={handleSubmit}>
-                    <div>
-                      <label className="lead-label">Full Name</label>
-                      <input className="modal-input" placeholder="Enter Your Full Name" required
-                        value={form.fullName} onChange={set("fullName")} />
-                    </div>
-                    <div>
-                      <label className="lead-label">Phone Number</label>
-                      <input className="modal-input" type="tel" placeholder="Enter Your Phone Number" required
-                        value={form.phone} onChange={set("phone")} />
-                    </div>
-                    <div>
-                      <label className="lead-label">Email Address</label>
-                      <input className="modal-input" type="email" placeholder="Enter Your Email Address" required
-                        value={form.email} onChange={set("email")} />
-                    </div>
-                    <div>
-                      <label className="lead-label">Zip Code</label>
-                      <input className="modal-input" placeholder="Enter Your Zip Code"
-                        value={form.zip} onChange={set("zip")} />
-                    </div>
-
-                    {status === "error" && (
-                      <p className="modal-error">Connection error. Please try again or call us directly.</p>
-                    )}
-
-                    <button type="submit" className="modal-submit" disabled={status === "loading"}>
-                      {status === "loading" ? "Submitting..." : "Submit"}
-                    </button>
-                  </form>
-                </>
-              )}
-            </motion.div>
+                </div>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>

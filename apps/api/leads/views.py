@@ -28,6 +28,7 @@ def create_lead(request):
             part_slug   = data.get("partSlug",   "").strip(),
             part_type   = data.get("partType",   "").strip(),
             source_page = data.get("sourcePage", "").strip(),
+            notes       = data.get("notes",      "").strip(),   # ← was missing
         )
         r = JsonResponse({"success": True, "id": lead.id, "message": "Lead saved"}, status=201)
     except Exception as e:
@@ -43,7 +44,7 @@ def list_leads(request):
         "id", "full_name", "phone", "email", "zip_code",
         "car_make", "car_model", "car_year",
         "part_slug", "part_type", "source_page",
-        "created_at", "is_contacted"
+        "notes", "created_at", "is_contacted"
     )
     r = JsonResponse(list(leads), safe=False)
     r["Access-Control-Allow-Origin"] = "*"

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { X, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { postLead } from "@/lib/api";
 
 interface SidebarProps {
   partSlug?: string;
@@ -12,8 +13,8 @@ interface SidebarProps {
 }
 
 export default function LeadFormSidebar({ partSlug = "", sourcePage = "", make = "", model = "", year = "" }: SidebarProps) {
-  const [open, setOpen] = useState(true);
-  const [form, setForm] = useState({ fullName: "", phone: "", email: "", zip: "" });
+  const [open, setOpen]     = useState(true);
+  const [form, setForm]     = useState({ fullName: "", phone: "", email: "", zip: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -23,18 +24,13 @@ export default function LeadFormSidebar({ partSlug = "", sourcePage = "", make =
     e.preventDefault();
     setStatus("loading");
     try {
-      const res = await fetch("http://localhost:8000/api/leads/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: form.fullName, phone: form.phone,
-          email: form.email, zip: form.zip,
-          carMake: make, carModel: model, carYear: year,
-          partSlug, partType: partSlug,
-          sourcePage,
-        }),
+      const ok = await postLead({
+        fullName: form.fullName, phone: form.phone,
+        email: form.email, zip: form.zip,
+        carMake: make, carModel: model, carYear: year,
+        partSlug, partType: partSlug, sourcePage,
       });
-      setStatus(res.ok || res.status === 201 ? "success" : "error");
+      setStatus(ok ? "success" : "error");
     } catch {
       setStatus("error");
     }
@@ -67,7 +63,6 @@ export default function LeadFormSidebar({ partSlug = "", sourcePage = "", make =
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 320, damping: 32 }}
           >
-            {/* Close */}
             <button className="sidebar-close" onClick={() => setOpen(false)} aria-label="Close">
               <X size={14} />
             </button>
@@ -83,33 +78,33 @@ export default function LeadFormSidebar({ partSlug = "", sourcePage = "", make =
               </div>
             ) : (
               <>
-                <h2 className="sidebar-title">Please Enter Your Contact Details</h2>
+                <h2 className="sidebar-title">Get a Free Quote Now</h2>
                 <form className="sidebar-form" onSubmit={handleSubmit}>
                   <div>
                     <label className="sidebar-label">Full Name</label>
-                    <input className="sidebar-input" placeholder="Enter Your Full Name" required
+                    <input className="sidebar-input" placeholder="Your Full Name" required
                       value={form.fullName} onChange={set("fullName")} />
                   </div>
                   <div>
                     <label className="sidebar-label">Phone Number</label>
-                    <input className="sidebar-input" type="tel" placeholder="Enter Your Phone Number" required
+                    <input className="sidebar-input" type="tel" placeholder="Your Phone Number" required
                       value={form.phone} onChange={set("phone")} />
                   </div>
                   <div>
                     <label className="sidebar-label">Email Address</label>
-                    <input className="sidebar-input" type="email" placeholder="Enter Your Email Address" required
+                    <input className="sidebar-input" type="email" placeholder="Your Email Address" required
                       value={form.email} onChange={set("email")} />
                   </div>
                   <div>
                     <label className="sidebar-label">Zip Code</label>
-                    <input className="sidebar-input" placeholder="Enter Your Zip Code"
+                    <input className="sidebar-input" placeholder="Zip Code"
                       value={form.zip} onChange={set("zip")} />
                   </div>
                   {status === "error" && (
                     <p className="sidebar-error">Connection error. Please try again.</p>
                   )}
                   <button type="submit" className="sidebar-submit" disabled={status === "loading"}>
-                    {status === "loading" ? "Submitting..." : "Submit"}
+                    {status === "loading" ? "Submitting…" : "Submit Request"}
                   </button>
                 </form>
               </>
