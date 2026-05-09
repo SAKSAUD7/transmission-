@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { RotateCw, Expand } from "lucide-react";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
+
 interface AssetResult {
   found: boolean;
   videoUrl?: string;
@@ -23,8 +25,7 @@ async function fetchAsset(make: string, model: string, assetType: "car" | "part"
   if (!make) return { found: false };
   try {
     const params = new URLSearchParams({ make, model, asset_type: assetType, part_slug: partSlug });
-    // Use relative URL — Next.js proxies /api/* → Django in dev, Nginx proxies in prod
-    const res = await fetch(`/api/vehicles/360/?${params}`);
+    const res = await fetch(`${API_BASE}/api/vehicles/360/?${params}`);
     if (!res.ok) return { found: false };
     return await res.json();
   } catch {
@@ -41,8 +42,9 @@ export default function VehicleCreative({ make, model, year, partType, partSlug,
   const active   = showPart ? partAsset : carAsset;
   const hasVideo = active.found && !!active.videoUrl;
 
-  // Use relative URL — /media/* is proxied by Next.js in dev, Nginx in prod
-  const videoSrc = hasVideo ? active.videoUrl! : null;
+  // Prefix videoUrl with API_BASE: in dev → http://localhost:8000/media/...
+  // In prod (Nginx) → /media/... is served directly
+  const videoSrc = hasVideo ? `${API_BASE}${active.videoUrl!}` : null;
 
   useEffect(() => {
     if (!make) { setCarAsset({ found: false }); return; }

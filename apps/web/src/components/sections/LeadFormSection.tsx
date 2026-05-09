@@ -5,7 +5,7 @@ import { X, CheckCircle } from "lucide-react";
 import { CAR_MAKES, CAR_MODELS_BY_MAKE, YEARS } from "@/data/vehicles";
 import { getPartImage } from "@/data/vehicleImages";
 import VehicleCreative from "@/components/ui/VehicleCreative";
-import { postLead } from "@/lib/api";
+import { postLead, API_BASE } from "@/lib/api";
 
 interface LeadFormProps {
   title: string;
@@ -30,7 +30,7 @@ export default function LeadFormSection({
   useEffect(() => {
     if (!make) { setApiModels([]); return; }
     setModelsLoading(true);
-    fetch(`/api/vehicles/models/?make=${encodeURIComponent(make)}`)
+    fetch(`${API_BASE}/api/vehicles/models/?make=${encodeURIComponent(make)}`)
       .then(r => r.json())
       .then((data: { id: number; name: string }[]) => {
         setApiModels(Array.isArray(data) && data.length > 0 ? data.map(m => m.name) : []);
