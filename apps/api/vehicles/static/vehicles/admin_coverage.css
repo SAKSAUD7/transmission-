@@ -1,0 +1,26 @@
+/* Django admin extra styles for 360° asset management */
+
+/* Make inline fieldsets inside VehicleModel more readable */
+.inline-group .stacked .inline-related h3 {
+  background: #1e293b;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px 4px 0 0;
+  font-size: 13px;
+}
+
+/* Highlight the car/part type badge in list */
+.field-asset_type_badge span,
+.field-page_name_display span {
+  white-space: nowrap;
+}
+
+/* Coverage badge colours */
+.badge-complete { color: #16a34a; font-weight: 700; }
+.badge-partial  { color: #d97706; font-weight: 700; }
+.badge-empty    { color: #dc2626; font-weight: 700; }
+
+/* part_slug dropdown — make it wider */
+.field-part_slug select {
+  min-width: 300px;
+}

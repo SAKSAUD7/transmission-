@@ -55,3 +55,11 @@ apps/api/media/
 apps/web/public/videos/*.mp4
 # Russian-named engine video
 *.mp4
+
+# Django generated/collected static files
+apps/api/staticfiles/
+
+# Python bytecode cache
+**/__pycache__/
+*.pyc
+*.pyo

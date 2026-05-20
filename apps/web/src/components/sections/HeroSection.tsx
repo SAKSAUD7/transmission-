@@ -14,22 +14,26 @@ export default function HeroSection({
 }: HeroProps) {
   return (
     <section className="hero">
+      {/* Background */}
       {videoUrl ? (
         <video src={videoUrl} autoPlay muted loop playsInline className="hero-video" />
       ) : (
-        <Image src={heroImage} alt="Auto Parts" fill style={{ objectFit: "cover", opacity: 0.55 }} priority />
+        <Image src={heroImage} alt="Auto Parts" fill style={{ objectFit: "cover", opacity: 0.65 }} priority />
       )}
 
+      {/* Gradient overlay */}
       <div className="hero-overlay" />
 
+      {/* Phone badge */}
       <div className="hero-phone-badge">
-        <Phone size={16} color="#fff" />
+        <Phone size={17} color="#fff" />
         <div>
-          <div className="hero-phone-number">1386 688 3295</div>
+          <div className="hero-phone-number">(800) 495-9912</div>
           <div className="hero-phone-label">Call Us Now</div>
         </div>
       </div>
 
+      {/* Main content */}
       <div className="hero-content">
         <h1 className="hero-title">{headline}</h1>
         <p className="hero-subtitle">{subtitle}</p>
@@ -37,10 +41,17 @@ export default function HeroSection({
           className="hero-cta"
           onClick={() => document.getElementById("lead-form")?.scrollIntoView({ behavior: "smooth" })}
         >
-          Contact Now
+          Find My Part
         </button>
       </div>
 
+      {/* Scroll indicator */}
+      <div className="hero-scroll-hint">
+        <div className="hero-scroll-line" />
+        <span className="hero-scroll-label">Scroll</span>
+      </div>
+
+      {/* Slide dots */}
       <div className="hero-dots">
         {[0, 1, 2].map(i => (
           <div key={i} className={`hero-dot${i === 0 ? " active" : ""}`} />

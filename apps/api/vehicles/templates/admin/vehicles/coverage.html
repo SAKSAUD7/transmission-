@@ -1,0 +1,114 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Coverage Matrix — {{ title }}{% endblock %}
+
+{% block content %}
+<style>
+  .cov-wrap          { overflow-x: auto; margin-top: 16px; }
+  .cov-table         { border-collapse: collapse; font-size: 12px; min-width: 900px; }
+  .cov-table th      { background: #1e293b; color: #fff; padding: 8px 6px; white-space: nowrap;
+                       text-align: center; position: sticky; top: 0; z-index: 2; }
+  .cov-table th.vehicle { text-align: left; padding-left: 12px; min-width: 200px; }
+  .cov-table td      { border: 1px solid #e5e7eb; padding: 5px 6px; text-align: center; }
+  .cov-table td.vehicle-cell { text-align: left; padding-left: 12px; font-weight: 600; }
+  .cov-table td.vehicle-cell small { font-weight: 400; color: #6b7280; display: block; }
+  .cov-table tr:hover td { background: #f0f9ff; }
+  .cov-table td.ok       { background: #f0fdf4; }
+  .cov-table td.inactive { background: #fefce8; }
+  .cov-table td.missing  { background: #fef2f2; }
+  .cov-table td a        { text-decoration: none; font-size: 14px; }
+  .cov-table td a:hover  { transform: scale(1.3); display: inline-block; }
+  .badge   { display: inline-block; padding: 2px 8px; border-radius: 10px;
+             font-size: 11px; font-weight: 700; color: #fff; }
+  .badge-g { background: #16a34a; }
+  .badge-y { background: #d97706; }
+  .badge-r { background: #dc2626; }
+  .legend  { display: flex; gap: 16px; margin: 12px 0 4px; font-size: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 4px; }
+  .legend-dot  { width: 12px; height: 12px; border-radius: 3px; }
+  .summary     { margin: 8px 0 16px; font-size: 13px; color: #374151; }
+  .btn-add     { background: #2563eb; color: #fff; padding: 8px 16px;
+                 border-radius: 6px; text-decoration: none; font-size: 13px;
+                 font-weight: 600; display: inline-block; margin-bottom: 16px; }
+  .btn-add:hover { background: #1d4ed8; }
+</style>
+
+<h1>{{ title }}</h1>
+
+<div class="summary">
+  <strong>{{ rows|length }}</strong> vehicle models tracked across
+  <strong>{{ part_pages|length }}</strong> part pages.
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#f0fdf4;border:1px solid #bbf7d0"></div> ✅ Has active video</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#fefce8;border:1px solid #fde68a"></div> 🟡 Asset exists but inactive/no video</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#fef2f2;border:1px solid #fecaca"></div> ❌ Missing — click to add</div>
+</div>
+
+<a href="{% url 'admin:vehicles_vehicle360asset_add' %}" class="btn-add">+ Add New 360° Asset</a>
+
+<div class="cov-wrap">
+  <table class="cov-table">
+    <thead>
+      <tr>
+        <th class="vehicle">Vehicle</th>
+        <th>Car 360°</th>
+        {% for slug, label in part_pages %}
+          <th title="{{ slug }}">{{ label }}</th>
+        {% endfor %}
+        <th>Coverage</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td class="vehicle-cell">
+          <a href="{{ row.model_url }}" style="color:#1d4ed8">{{ row.make }}</a>
+          <small>{{ row.model }}</small>
+        </td>
+
+        {# Car 360° cell #}
+        {% with c=row.car_cell %}
+        <td class="{{ c.status }}">
+          {% if c.url %}
+            <a href="{{ c.url }}" title="Add car 360° for {{ row.make }} {{ row.model }}">{{ c.icon }}</a>
+          {% else %}
+            {{ c.icon }}
+          {% endif %}
+        </td>
+        {% endwith %}
+
+        {# Part page cells #}
+        {% for cell in row.page_cells %}
+        <td class="{{ cell.status }}">
+          {% if cell.url %}
+            <a href="{{ cell.url }}" title="Add {{ cell.label }} for {{ row.make }} {{ row.model }}">{{ cell.icon }}</a>
+          {% else %}
+            {{ cell.icon }}
+          {% endif %}
+        </td>
+        {% endfor %}
+
+        {# Coverage badge #}
+        <td>
+          {% if row.covered == row.total %}
+            <span class="badge badge-g">{{ row.covered }}/{{ row.total }}</span>
+          {% elif row.covered > 0 %}
+            <span class="badge badge-y">{{ row.covered }}/{{ row.total }}</span>
+          {% else %}
+            <span class="badge badge-r">0/{{ row.total }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="{{ part_pages|length|add:3 }}" style="text-align:center;padding:24px;color:#9ca3af;">
+          No vehicle models yet.
+          <a href="{% url 'admin:vehicles_vehiclemodel_add' %}">Add your first model →</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
