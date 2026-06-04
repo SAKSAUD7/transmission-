@@ -8,6 +8,7 @@ import BenefitsSection from "@/components/sections/BenefitsSection";
 import PartnersSection from "@/components/sections/PartnersSection";
 import WarrantySection from "@/components/sections/WarrantySection";
 import ContactSection from "@/components/sections/ContactSection";
+import ReviewsSection from "@/components/sections/ReviewsSection";
 import LeadFormSidebar from "@/components/forms/LeadFormSidebar";
 import { TRANSMISSION_TYPES } from "@/data/vehicles";
 
@@ -61,6 +62,7 @@ export default function TransmissionsPage() {
       <PartnersSection />
       <WarrantySection productName="Transmission" packageDetails={PACKAGE_DETAILS} />
       <ContactSection brand="TransmissionsForSale" />
+      <ReviewsSection partName="Transmission" />
       <Footer brand="TransmissionsForSale" />
     </div>
   );

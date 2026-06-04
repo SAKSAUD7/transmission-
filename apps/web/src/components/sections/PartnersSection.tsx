@@ -1,120 +1,72 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-/* ── Inline SVG brand logos ─────────────────────────────────────────────── */
-function SuzukiLogo({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#003087";
-  return (
-    <svg width="38" height="22" viewBox="0 0 110 60" fill="none">
-      <text x="0" y="50" fontFamily="Arial Black,sans-serif" fontWeight="900" fontSize="52" fill={c} letterSpacing="-2">SUZUKI</text>
-    </svg>
-  );
-}
-function HondaLogo({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#CC0000";
-  return (
-    <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
-      <path d="M50 8 C34 8 22 20 22 36 L22 64 C22 80 34 92 50 92 C66 92 78 80 78 64 L78 36 C78 20 66 8 50 8Z" fill={c}/>
-      <text x="50" y="68" fontFamily="Arial Black,sans-serif" fontWeight="900" fontSize="52" fill="#fff" textAnchor="middle">H</text>
-    </svg>
-  );
-}
-function HyundaiLogo({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#002C5F";
-  return (
-    <svg width="42" height="24" viewBox="0 0 130 60" fill="none">
-      <ellipse cx="65" cy="30" rx="62" ry="28" fill={c}/>
-      <text x="65" y="42" fontFamily="Arial Black,sans-serif" fontWeight="900" fontSize="30" fill="#fff" textAnchor="middle" letterSpacing="-1">HYUNDAI</text>
-    </svg>
-  );
-}
-function LamborghiniLogo({ active }: { active: boolean }) {
-  const fill = active ? "#f5c842" : "#1a1a1a";
-  const textC = active ? "#1a1a1a" : "#f5c842";
-  return (
-    <svg width="38" height="38" viewBox="0 0 100 100" fill="none">
-      <polygon points="50,5 95,25 95,75 50,95 5,75 5,25" fill={fill}/>
-      <text x="50" y="58" fontFamily="Arial Black,sans-serif" fontWeight="900" fontSize="28" fill={textC} textAnchor="middle">LB</text>
-    </svg>
-  );
-}
-function AudiLogo({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#555";
-  return (
-    <svg width="52" height="20" viewBox="0 0 160 56" fill="none">
-      {[16,52,88,124].map((cx, i) => (
-        <circle key={i} cx={cx} cy="28" r="24" stroke={c} strokeWidth="5" fill="none"/>
-      ))}
-    </svg>
-  );
-}
-function MahindraLogo({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#C8102E";
-  return (
-    <svg width="42" height="22" viewBox="0 0 130 60" fill="none">
-      <text x="0" y="48" fontFamily="Arial Black,sans-serif" fontWeight="900" fontSize="44" fill={c} letterSpacing="-1">MAHINDRA</text>
-    </svg>
-  );
-}
-function TataLogo({ active }: { active: boolean }) {
-  const c = active ? "#fff" : "#00539C";
-  return (
-    <svg width="38" height="28" viewBox="0 0 100 70" fill="none">
-      <ellipse cx="50" cy="35" rx="48" ry="32" fill={c}/>
-      <text x="50" y="46" fontFamily="Arial Black,sans-serif" fontWeight="900" fontSize="30" fill="#fff" textAnchor="middle">TATA</text>
-    </svg>
-  );
-}
-
+/* ─────────────────────── PARTNER DATA ─────────────────────────────────── */
 const PARTNERS = [
   {
-    name: "SUZUKI", tagline: "Way of Life!",
-    bg: "#003087", text: "#fff",
+    name: "SUZUKI",
+    label: "Suzuki",
+    tagline: "Way of Life!",
+    accent: "#003087",
+    logo: "/images/logos/suzuki.png",
     desc: "Suzuki is a global leader in compact vehicles and motorcycles, known for fuel efficiency, reliability, and innovative engineering. Suzuki parts are designed to deliver consistent performance across diverse conditions.",
-    Logo: SuzukiLogo,
   },
   {
-    name: "HONDA", tagline: "The Power of Dreams",
-    bg: "#CC0000", text: "#fff",
+    name: "HONDA",
+    label: "Honda",
+    tagline: "The Power of Dreams",
+    accent: "#CC0000",
+    logo: "/images/logos/honda.png",
     desc: "Honda is one of the world's largest automotive manufacturers, celebrated for its engineering excellence and reliability. Honda parts meet the highest standards for quality and long-term durability.",
-    Logo: HondaLogo,
   },
   {
-    name: "HYUNDAI", tagline: "New Thinking. New Possibilities.",
-    bg: "#002C5F", text: "#fff",
-    desc: "Hyundai has rapidly grown into a globally recognized automotive brand offering modern design and advanced technology. Hyundai components are rigorously tested to ensure optimal performance.",
-    Logo: HyundaiLogo,
+    name: "HYUNDAI",
+    label: "Hyundai",
+    tagline: "New Thinking. New Possibilities.",
+    accent: "#002C5F",
+    logo: "/images/logos/hyundai.png",
+    desc: "Hyundai has rapidly grown into a globally recognised automotive brand offering modern design and advanced technology. Hyundai components are rigorously tested to ensure optimal performance.",
   },
   {
-    name: "LAMBORGHINI", tagline: "Expect the Unexpected",
-    bg: "#1a1a1a", text: "#f5c842",
-    desc: "Lamborghini is an Italian luxury automaker known for its high-performance sports cars with striking, aggressive designs. The brand combines advanced engineering with exclusive styling to deliver an outstanding driving experience.",
-    Logo: LamborghiniLogo,
+    name: "LAMBORGHINI",
+    label: "Lamborghini",
+    tagline: "Expect the Unexpected",
+    accent: "#D4A017",
+    logo: "/images/logos/lamborghini.png",
+    desc: "Lamborghini is an Italian luxury automaker known for its high-performance sports cars with striking, aggressive designs. The brand combines advanced engineering with exclusive styling to deliver an exhilarating driving experience. Owning a Lamborghini is a symbol of status and prestige.",
   },
   {
-    name: "AUDI", tagline: "Vorsprung durch Technik",
-    bg: "#444", text: "#fff",
+    name: "AUDI",
+    label: "Audi",
+    tagline: "Vorsprung durch Technik",
+    accent: "#BB0A21",
+    logo: "/images/logos/audi.png",
     desc: "Audi represents the pinnacle of German engineering — precision, performance, and luxury in every component. Audi parts are crafted to exacting tolerances for unmatched reliability and safety.",
-    Logo: AudiLogo,
   },
   {
-    name: "MAHINDRA", tagline: "Rise",
-    bg: "#C8102E", text: "#fff",
+    name: "MAHINDRA",
+    label: "Mahindra",
+    tagline: "Rise",
+    accent: "#C8102E",
+    logo: "/images/logos/mahindra.png",
     desc: "Mahindra is India's leading automotive manufacturer, known for robust SUVs and utility vehicles built for diverse terrains. Mahindra parts are engineered for toughness and dependability.",
-    Logo: MahindraLogo,
   },
   {
-    name: "TATA", tagline: "Connecting Aspirations",
-    bg: "#00539C", text: "#fff",
+    name: "TATA",
+    label: "Tata",
+    tagline: "Connecting Aspirations",
+    accent: "#00539C",
+    logo: "/images/logos/tata.png",
     desc: "TATA Motors is a global automotive leader offering a wide range of vehicles from passenger cars to commercial trucks. TATA components deliver proven reliability at competitive prices.",
-    Logo: TataLogo,
   },
 ];
 
+/* ─────────────────────── SECTION ───────────────────────────────────────── */
 export default function PartnersSection() {
-  const [active, setActive] = useState(1); // Start on Honda
+  const [active, setActive] = useState(3); // Default: Lamborghini
 
   const prev     = () => setActive(a => (a - 1 + PARTNERS.length) % PARTNERS.length);
   const next     = () => setActive(a => (a + 1) % PARTNERS.length);
@@ -126,45 +78,69 @@ export default function PartnersSection() {
         <p className="partners-eyebrow">Trusted Brands</p>
         <h2 className="partners-title">Our Partners</h2>
 
-        {/* Logo row */}
+        {/* ── Logo row ── */}
         <div className="partners-logos">
-          {PARTNERS.map((p, i) => (
-            <button
-              key={p.name}
-              className="partner-btn"
-              onClick={() => setActive(i)}
-              aria-label={p.name}
-              title={p.name}
-            >
-              <motion.div
-                className="partner-logo-circle"
-                animate={{
-                  width:      i === active ? 88 : 64,
-                  height:     i === active ? 88 : 64,
-                  background: i === active ? p.bg : "#f3f4f6",
-                  boxShadow:  i === active ? `0 8px 28px ${p.bg}55` : "0 2px 8px rgba(0,0,0,0.06)",
-                  borderColor: i === active ? "rgba(0,0,0,0)" : "#e5e7eb",
-                }}
-                transition={{ type: "spring", stiffness: 340, damping: 26 }}
-                style={{ padding: i === active ? 16 : 12 }}
+          {PARTNERS.map((p, i) => {
+            const isActive = i === active;
+            return (
+              <button
+                key={p.name}
+                className="partner-btn"
+                onClick={() => setActive(i)}
+                aria-label={p.label}
+                title={p.label}
               >
-                <p.Logo active={i === active} />
-              </motion.div>
-              <motion.span
-                className="partner-name-label"
-                animate={{
-                  color:      i === active ? p.bg : "#9ca3af",
-                  fontWeight: i === active ? 800 : 500,
-                }}
-                transition={{ duration: 0.2 }}
-              >
-                {p.name}
-              </motion.span>
-            </button>
-          ))}
+                <motion.div
+                  className="partner-logo-circle"
+                  animate={{
+                    width:     isActive ? 140 : 84,
+                    height:    isActive ? 140 : 84,
+                    boxShadow: isActive
+                      ? "0 8px 32px rgba(0,0,0,0.18)"
+                      : "0 2px 10px rgba(0,0,0,0.07)",
+                  }}
+                  transition={{ type: "spring", stiffness: 320, damping: 26 }}
+                  style={{
+                    background: "#ffffff",
+                    borderRadius: "50%",
+                    border: isActive ? "2px solid #e8e8e8" : "1.5px solid #ebebeb",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    overflow: "hidden",
+                    flexShrink: 0,
+                    padding: isActive ? 16 : 10,
+                  }}
+                >
+                  <Image
+                    src={p.logo}
+                    alt={p.label}
+                    width={isActive ? 108 : 64}
+                    height={isActive ? 108 : 64}
+                    style={{
+                      objectFit: "contain",
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  />
+                </motion.div>
+
+                <motion.span
+                  className="partner-name-label"
+                  animate={{
+                    color:      isActive ? p.accent : "#9ca3af",
+                    fontWeight: isActive ? 700 : 500,
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {p.label}
+                </motion.span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Featured description */}
+        {/* ── Featured card ── */}
         <AnimatePresence mode="wait">
           <motion.div
             key={active}
@@ -176,16 +152,20 @@ export default function PartnersSection() {
           >
             <span
               className="partners-feat-pill"
-              style={{ background: `${featured.bg}12`, color: featured.bg, border: `1.5px solid ${featured.bg}30` }}
+              style={{
+                background: `${featured.accent}14`,
+                color:       featured.accent,
+                border:      `1.5px solid ${featured.accent}30`,
+              }}
             >
               {featured.tagline}
             </span>
-            <h3 className="partners-feat-name">{featured.name}</h3>
+            <h3 className="partners-feat-name">{featured.label}</h3>
             <p className="partners-feat-desc">{featured.desc}</p>
           </motion.div>
         </AnimatePresence>
 
-        {/* Navigation */}
+        {/* ── Navigation ── */}
         <div className="partners-nav">
           <button className="partners-arrow" onClick={prev} aria-label="Previous">
             <ChevronLeft size={18} color="#374151" />

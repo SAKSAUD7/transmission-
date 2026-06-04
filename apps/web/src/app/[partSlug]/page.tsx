@@ -11,6 +11,7 @@ import BenefitsSection from "@/components/sections/BenefitsSection";
 import PartnersSection from "@/components/sections/PartnersSection";
 import WarrantySection from "@/components/sections/WarrantySection";
 import ContactSection from "@/components/sections/ContactSection";
+import ReviewsSection from "@/components/sections/ReviewsSection";
 import LeadFormSidebar from "@/components/forms/LeadFormSidebar";
 
 const GENERIC_TYPES = ["Standard / OEM", "Premium", "Aftermarket", "Remanufactured", "Used / Tested"];
@@ -67,6 +68,7 @@ export default async function PartPage({ params }: Props) {
       <PartnersSection />
       <WarrantySection productName={part.name} packageDetails={part.packageDetails} />
       <ContactSection brand={part.pageTitle} />
+      <ReviewsSection partName={part.name} />
       <Footer brand={part.pageTitle} />
     </div>
   );
