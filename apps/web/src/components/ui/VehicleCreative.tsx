@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { RotateCw, Expand } from "lucide-react";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
+import { API_BASE } from "@/lib/api";
 
 interface AssetResult {
   found: boolean;
