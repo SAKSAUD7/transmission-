@@ -1,3 +1,9 @@
+export interface PartType {
+  label: string;   // "Automatic Transmission"
+  slug: string;    // "automatic"
+  description: string; // short sentence for SEO / hero sub-headline
+}
+
 export interface PartConfig {
   slug: string;
   name: string;
@@ -13,6 +19,7 @@ export interface PartConfig {
   benefitTitle: string;
   packageDetails: string[];
   videoUrl?: string;
+  types?: PartType[];         // sub-type pages, e.g. automatic / manual / cvt
   seo: {
     title: string;
     description: string;

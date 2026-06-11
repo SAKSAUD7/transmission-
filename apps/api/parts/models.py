@@ -68,7 +68,7 @@ class PartType(models.Model):
         verbose_name_plural = "Part Type Options"
 
     def __str__(self):
-        return f"{self.part_page.name} → {self.label}"
+        return self.label
 
 
 class PackageDetail(models.Model):

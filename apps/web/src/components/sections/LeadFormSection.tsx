@@ -13,15 +13,16 @@ interface LeadFormProps {
   partTypeOptions: string[];
   partSlug: string;
   sourcePage: string;
+  defaultPartType?: string; // pre-select when arriving from a type sub-page
 }
 
 export default function LeadFormSection({
-  title, partTypeLabel, partTypeOptions, partSlug, sourcePage,
+  title, partTypeLabel, partTypeOptions, partSlug, sourcePage, defaultPartType,
 }: LeadFormProps) {
   const [make,     setMake]     = useState("");
   const [model,    setModel]    = useState("");
   const [year,     setYear]     = useState("");
-  const [partType, setPartType] = useState("");
+  const [partType, setPartType] = useState(defaultPartType ?? "");
 
   // ── Dynamic model loading: API first, static fallback ─────────────────────
   const [apiModels,     setApiModels]     = useState<string[]>([]);

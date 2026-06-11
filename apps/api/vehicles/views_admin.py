@@ -6,11 +6,38 @@ Each cell = ✅ has active video | 🟡 exists but inactive | ❌ missing.
 Clicking ❌ goes straight to the "Add 360° Asset" pre-filled form.
 """
 from django.contrib.admin.views.decorators import staff_member_required
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.html import format_html
 
 from .models import VehicleMake, VehicleModel, Vehicle360Asset, PART_PAGES, PART_PAGE_LABELS
+from parts.models import PartType
+
+
+
+def part_types_for_slug(request):
+    """
+    AJAX endpoint (no auth required — data is not sensitive).
+    Returns PartType options for a given part_slug.
+    Called by admin_asset_form.js when the Part Slug dropdown changes.
+    GET /api/vehicles/part-types/?part_slug=transmissions-for-sale
+    """
+    slug = request.GET.get("part_slug", "").strip()
+    if not slug:
+        data = [{"id": "", "label": "All types (generic)"}]
+    else:
+        types = list(
+            PartType.objects.filter(part_page__slug=slug)
+            .order_by("order", "label")
+            .values("id", "label")
+        )
+        data = [{"id": "", "label": "All types (generic)"}] + types
+    r = JsonResponse(data, safe=False)
+    r["Access-Control-Allow-Origin"] = "*"
+    return r
+
+
 
 
 @staff_member_required

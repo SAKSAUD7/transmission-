@@ -21,10 +21,17 @@ interface Props {
   partImage: string;
 }
 
-async function fetchAsset(make: string, model: string, assetType: "car" | "part", partSlug: string): Promise<AssetResult> {
-  if (!make) return { found: false };
+async function fetchAsset(make: string, model: string, assetType: "car" | "part", partSlug: string, partType: string): Promise<AssetResult> {
+  if (assetType === "car" && !make) return { found: false };
+  if (assetType === "part" && !partSlug) return { found: false };
+  
   try {
-    const params = new URLSearchParams({ make, model, asset_type: assetType, part_slug: partSlug });
+    const params = new URLSearchParams({ asset_type: assetType });
+    if (make) params.append("make", make);
+    if (model) params.append("model", model);
+    if (partSlug) params.append("part_slug", partSlug);
+    if (partType) params.append("part_type", partType);
+
     const res = await fetch(`${API_BASE}/api/vehicles/360/?${params}`);
     if (!res.ok) return { found: false };
     return await res.json();
@@ -37,30 +44,46 @@ export default function VehicleCreative({ make, model, year, partType, partSlug,
   const [carAsset,     setCarAsset]     = useState<AssetResult>({ found: false });
   const [partAsset,    setPartAsset]    = useState<AssetResult>({ found: false });
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [lastUpdated,  setLastUpdated]  = useState<"car" | "part">("part");
 
-  const showPart = !!partType && partAsset.found;
-  const active   = showPart ? partAsset : carAsset;
+  useEffect(() => {
+    fetchAsset(make, model, "car", "", "").then(setCarAsset);
+    if (make) setLastUpdated("car");
+  }, [make, model]);
+
+  useEffect(() => {
+    if (!partType) { setPartAsset({ found: false }); return; }
+    fetchAsset("", "", "part", partSlug, partType).then(setPartAsset);
+    if (partType) setLastUpdated("part");
+  }, [partType, partSlug]);
+
+  let active = carAsset;
+  let showPart = false;
+
+  if (lastUpdated === "part") {
+    if (partAsset.found) { active = partAsset; showPart = true; }
+    else { active = carAsset; showPart = false; }
+  } else {
+    if (carAsset.found) { active = carAsset; showPart = false; }
+    else { active = partAsset; showPart = true; }
+  }
+
   const hasVideo = active.found && !!active.videoUrl;
 
   // Prefix videoUrl with API_BASE: in dev → http://localhost:8000/media/...
   // In prod (Nginx) → /media/... is served directly
   const videoSrc = hasVideo ? `${API_BASE}${active.videoUrl!}` : null;
-
-  useEffect(() => {
-    if (!make) { setCarAsset({ found: false }); return; }
-    fetchAsset(make, model, "car", "").then(setCarAsset);
-  }, [make, model]);
-
-  useEffect(() => {
-    if (!partType || !make) { setPartAsset({ found: false }); return; }
-    fetchAsset(make, model, "part", partSlug).then(setPartAsset);
-  }, [make, model, partType, partSlug]);
+  const isImage = videoSrc ? /\.(jpg|jpeg|png|webp|gif)$/i.test(videoSrc) : false;
 
   return (
     <div className="vc-wrap">
       {videoSrc ? (
         <>
-          <video key={videoSrc} src={videoSrc} autoPlay muted loop playsInline className="vc-video" />
+          {isImage ? (
+            <img key={videoSrc} src={videoSrc} alt="360 View" className="vc-video" style={{ objectFit: "contain" }} />
+          ) : (
+            <video key={videoSrc} src={videoSrc} autoPlay muted loop playsInline className="vc-video" />
+          )}
 
           <div className="vc-badge">
             <RotateCw size={11} /> 360°
@@ -71,7 +94,9 @@ export default function VehicleCreative({ make, model, year, partType, partSlug,
           </button>
 
           <div className="vc-label">
-            {showPart ? "Part View" : make}{model && ` · ${model}`}{year && ` · ${year}`}
+            {showPart ? (active.label || "Part View") : (
+              <>{make}{model && ` · ${model}`}{year && ` · ${year}`}</>
+            )}
           </div>
         </>
       ) : make ? (
@@ -109,7 +134,11 @@ export default function VehicleCreative({ make, model, year, partType, partSlug,
 
       {isFullscreen && videoSrc && (
         <div className="vc-fullscreen-modal" onClick={() => setIsFullscreen(false)}>
-          <video src={videoSrc} autoPlay muted loop playsInline className="vc-fullscreen-video" onClick={e => e.stopPropagation()} />
+          {isImage ? (
+            <img src={videoSrc} alt="360 View Fullscreen" className="vc-fullscreen-video" onClick={e => e.stopPropagation()} style={{ objectFit: "contain", maxWidth: "90vw", maxHeight: "90vh" }} />
+          ) : (
+            <video src={videoSrc} autoPlay muted loop playsInline className="vc-fullscreen-video" onClick={e => e.stopPropagation()} />
+          )}
           <button className="vc-fullscreen-close" onClick={() => setIsFullscreen(false)}>Close ✕</button>
         </div>
       )}

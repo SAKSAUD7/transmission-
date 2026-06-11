@@ -20,49 +20,43 @@ PART_PAGES = [
     ("abs-assembly-for-sale",              "ABS Assembly"),
 ]
 
-PART_PAGE_CHOICES = [("", "— Not applicable (car asset) —")] + PART_PAGES
+PART_PAGE_CHOICES = [("", "— Select Part Page —")] + PART_PAGES
 PART_PAGE_LABELS  = {slug: label for slug, label in PART_PAGES}
 
 
 # ── Smart upload path helpers ─────────────────────────────────────────────────
-def _make_slug(text: str) -> str:
+def _slug(text: str) -> str:
     return slugify(text or "unknown")
 
 
 def vehicle_video_upload_path(instance, filename: str) -> str:
     """
-    Organises uploaded videos into a meaningful folder hierarchy:
-
-    Car 360°:
-        360/vehicles/{make-slug}/{model-slug}/car.{ext}
-
-    Part 360° (specific model):
-        360/parts/{part-slug}/{make-slug}/{model-slug}/part.{ext}
-
-    Part 360° (generic / all models):
-        360/parts/{part-slug}/{make-slug}/generic/part.{ext}
+    Car 360°:   360/vehicles/{make}/{model}/car.{ext}
+    Part 360°:  360/parts/{part-slug}/{type-slug}/part.{ext}
     """
-    ext        = filename.rsplit(".", 1)[-1].lower() if "." in filename else "mp4"
-    make_slug  = _make_slug(instance.make.name  if instance.make  else "unknown")
-    model_slug = _make_slug(instance.model.name if instance.model else "generic")
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else "mp4"
 
     if instance.asset_type == "car":
+        make_slug  = _slug(instance.make.name  if instance.make  else "unknown")
+        model_slug = _slug(instance.model.name if instance.model else "generic")
         return f"360/vehicles/{make_slug}/{model_slug}/car.{ext}"
     else:
-        part = instance.part_slug or "unknown"
-        return f"360/parts/{part}/{make_slug}/{model_slug}/part.{ext}"
+        part      = instance.part_slug or "unknown"
+        type_slug = _slug(instance.part_type.label) if instance.part_type else "generic"
+        return f"360/parts/{part}/{type_slug}/part.{ext}"
 
 
 def vehicle_thumb_upload_path(instance, filename: str) -> str:
-    ext        = filename.rsplit(".", 1)[-1].lower() if "." in filename else "jpg"
-    make_slug  = _make_slug(instance.make.name  if instance.make  else "unknown")
-    model_slug = _make_slug(instance.model.name if instance.model else "generic")
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else "jpg"
 
     if instance.asset_type == "car":
+        make_slug  = _slug(instance.make.name  if instance.make  else "unknown")
+        model_slug = _slug(instance.model.name if instance.model else "generic")
         return f"360/vehicles/{make_slug}/{model_slug}/thumb.{ext}"
     else:
-        part = instance.part_slug or "unknown"
-        return f"360/parts/{part}/{make_slug}/{model_slug}/thumb.{ext}"
+        part      = instance.part_slug or "unknown"
+        type_slug = _slug(instance.part_type.label) if instance.part_type else "generic"
+        return f"360/parts/{part}/{type_slug}/thumb.{ext}"
 
 
 # ── Models ─────────────────────────────────────────────────────────────────────
@@ -100,52 +94,73 @@ class Vehicle360Asset(models.Model):
         ("part", "Part 360° View"),
     ]
 
-    make       = models.ForeignKey(VehicleMake,  on_delete=models.CASCADE, related_name="assets")
-    model      = models.ForeignKey(VehicleModel, on_delete=models.CASCADE, related_name="assets",
-                                   null=True, blank=True,
-                                   help_text="Leave blank = applies to ALL models of this make")
-    year       = models.CharField(max_length=10, blank=True,
-                                  help_text="Leave blank = applies to all years")
+    # ── Car fields (used for Car assets) ──────────────────────────────────────
+    make  = models.ForeignKey(
+        VehicleMake, on_delete=models.CASCADE, related_name="assets",
+        null=True, blank=True,
+        help_text="Required for Car assets. Leave blank for Part assets.",
+    )
+    model = models.ForeignKey(
+        VehicleModel, on_delete=models.CASCADE, related_name="assets",
+        null=True, blank=True,
+        help_text="Leave blank = applies to ALL models of this make",
+    )
+    year  = models.CharField(
+        max_length=10, blank=True,
+        help_text="Leave blank = applies to all years",
+    )
+
     asset_type = models.CharField(max_length=10, choices=ASSET_TYPES, default="car")
 
-    # Dropdown from PART_PAGES — prevents slug typos
-    part_slug  = models.CharField(
+    # ── Part fields (used for Part assets) ────────────────────────────────────
+    part_slug = models.CharField(
         max_length=100, blank=True,
         choices=PART_PAGE_CHOICES,
-        help_text="Select the website page this part video belongs to (Part assets only)",
+        help_text="Which part page does this asset belong to?",
+    )
+    part_type = models.ForeignKey(
+        "parts.PartType",
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name="assets",
+        help_text="Which type within this part? (e.g. Automatic, V6, Front)",
     )
 
-    video      = models.FileField(
+    # ── Media ─────────────────────────────────────────────────────────────────
+    video     = models.FileField(
         upload_to=vehicle_video_upload_path,
         blank=True, null=True,
-        help_text="Upload .mp4 360° spin video (max 50 MB recommended)",
+        help_text="Upload MP4 360° spin video (max 50 MB recommended)",
     )
-    thumbnail  = models.ImageField(
+    thumbnail = models.ImageField(
         upload_to=vehicle_thumb_upload_path,
         blank=True, null=True,
-        help_text="Optional preview image shown before video loads",
+        help_text="Optional preview thumbnail shown before video plays",
     )
-    label      = models.CharField(
+    label     = models.CharField(
         max_length=200, blank=True,
-        help_text='Friendly label shown on website, e.g. "Toyota Camry 2024"',
+        help_text='Friendly label, e.g. "Toyota Camry 2024" or "Automatic Transmission"',
     )
-    is_active  = models.BooleanField(default=True)
+    is_active   = models.BooleanField(default=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering        = ["make__name", "model__name", "asset_type", "part_slug"]
+        ordering        = ["asset_type", "part_slug", "part_type__label", "make__name", "model__name"]
         verbose_name    = "360° Asset"
         verbose_name_plural = "360° Assets"
 
     def __str__(self):
-        base = self.make.name
+        if self.asset_type == "part":
+            part  = PART_PAGE_LABELS.get(self.part_slug, self.part_slug or "?")
+            ttype = self.part_type.label if self.part_type else "All Types"
+            return f"{part} — {ttype}"
+        # Car asset
+        parts = [self.make.name if self.make else "?"]
         if self.model:
-            base += f" {self.model.name}"
+            parts.append(self.model.name)
         if self.year:
-            base += f" ({self.year})"
-        page = PART_PAGE_LABELS.get(self.part_slug, "") if self.part_slug else ""
-        suffix = page if page else self.get_asset_type_display()
-        return f"{base} — {suffix}"
+            parts.append(f"({self.year})")
+        return " ".join(parts) + " — Car 360°"
 
     @property
     def video_url(self):
@@ -157,5 +172,22 @@ class Vehicle360Asset(models.Model):
 
     @property
     def page_label(self):
-        """Human-friendly page name for the part slug."""
         return PART_PAGE_LABELS.get(self.part_slug, self.part_slug or "—")
+
+
+# ── Proxy models for split admin views ────────────────────────────────────────
+
+class CarAsset(Vehicle360Asset):
+    """Proxy: shows ONLY Car 360° assets — car-centric admin view."""
+    class Meta:
+        proxy = True
+        verbose_name        = "Car 360° Asset"
+        verbose_name_plural = "Car 360° Assets"
+
+
+class PartAsset(Vehicle360Asset):
+    """Proxy: shows ONLY Part 360° assets — part/type-centric admin view."""
+    class Meta:
+        proxy = True
+        verbose_name        = "Part 360° Asset"
+        verbose_name_plural = "Part 360° Assets"

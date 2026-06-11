@@ -55,13 +55,169 @@ export const CAR_MODELS_BY_MAKE: Record<string, string[]> = {
 export const YEARS = Array.from({ length: 36 }, (_, i) => String(2025 - i));
 
 export const TRANSMISSION_TYPES = [
-  "Automatic","Manual / Standard","CVT","Semi-Automatic","Dual-Clutch (DCT)",
-  "Tiptronic","Torque Converter","4-Speed Automatic","5-Speed Automatic",
-  "6-Speed Automatic","8-Speed Automatic","10-Speed Automatic",
+  "Automatic",
+  "Manual / Standard",
+  "CVT",
+  "Semi-Automatic",
+  "Dual-Clutch (DCT)",
+  "Tiptronic",
+  "Torque Converter",
+  "4-Speed Automatic",
+  "5-Speed Automatic",
+  "6-Speed Automatic",
+  "8-Speed Automatic",
+  "10-Speed Automatic",
 ];
 
 export const ENGINE_TYPES = [
-  "4-Cylinder","6-Cylinder (V6)","8-Cylinder (V8)","3-Cylinder",
-  "5-Cylinder","10-Cylinder (V10)","12-Cylinder (V12)","Diesel",
-  "Hybrid","Electric","Turbocharged","Supercharged",
+  "4-Cylinder",
+  "6-Cylinder (V6)",
+  "8-Cylinder (V8)",
+  "3-Cylinder",
+  "5-Cylinder",
+  "10-Cylinder (V10)",
+  "12-Cylinder (V12)",
+  "Diesel",
+  "Hybrid",
+  "Electric",
+  "Turbocharged",
+  "Supercharged",
 ];
+
+export const AXLE_SHAFT_TYPES = [
+  "Front Axle Shaft",
+  "Rear Axle Shaft",
+  "Left Axle Shaft",
+  "Right Axle Shaft",
+  "CV Axle",
+  "Half Shaft",
+  "Prop Shaft",
+];
+
+export const DRIVE_SHAFT_TYPES = [
+  "Front Drive Shaft",
+  "Rear Drive Shaft",
+  "One-Piece Drive Shaft",
+  "Two-Piece Drive Shaft",
+  "Carbon Fiber Drive Shaft",
+  "Aluminum Drive Shaft",
+  "4WD / AWD Drive Shaft",
+];
+
+export const DIFFERENTIAL_TYPES = [
+  "Front Differential",
+  "Rear Differential",
+  "Center Differential",
+  "Limited Slip (LSD)",
+  "Locking Differential",
+  "Open Differential",
+  "Posi-Traction",
+  "Torsen Differential",
+];
+
+export const SPEEDOMETER_TYPES = [
+  "Analog Speedometer",
+  "Digital Speedometer",
+  "Electronic (VSS) Speedometer",
+  "Cable-Driven Speedometer",
+  "Cluster Assembly",
+  "GPS Speedometer",
+];
+
+export const THROTTLE_BODY_TYPES = [
+  "Single Throttle Body",
+  "Dual Throttle Body",
+  "Electronic (ETC) Throttle Body",
+  "Cable-Operated Throttle Body",
+  "Fuel Injected Throttle Body",
+  "Carbureted Throttle Body",
+];
+
+export const TRANSFER_CASE_TYPES = [
+  "Chain-Driven Transfer Case",
+  "Gear-Driven Transfer Case",
+  "Manual Shift Transfer Case",
+  "Electric Shift Transfer Case",
+  "BW1354 Transfer Case",
+  "BW4407 Transfer Case",
+  "NP246 Transfer Case",
+  "NP261 Transfer Case",
+];
+
+export const STEERING_RACK_TYPES = [
+  "Power Steering Rack",
+  "Manual Steering Rack",
+  "Electric (EPS) Steering Rack",
+  "Hydraulic Steering Rack",
+  "Quick Ratio Steering Rack",
+  "Variable Ratio Steering Rack",
+];
+
+export const INTAKE_MANIFOLD_TYPES = [
+  "Upper Intake Manifold",
+  "Lower Intake Manifold",
+  "Aluminum Intake Manifold",
+  "Composite Intake Manifold",
+  "Performance Intake Manifold",
+  "Stock OEM Intake Manifold",
+  "Dual-Plane Intake Manifold",
+];
+
+export const STEERING_COLUMN_TYPES = [
+  "Tilt Steering Column",
+  "Telescoping Steering Column",
+  "Fixed Steering Column",
+  "Electric Steering Column",
+  "Steering Column with Airbag",
+  "Steering Column without Airbag",
+  "Collapsible Steering Column",
+];
+
+export const SPINDLE_KNUCKLE_TYPES = [
+  "Front Left Spindle Knuckle",
+  "Front Right Spindle Knuckle",
+  "Rear Left Spindle Knuckle",
+  "Rear Right Spindle Knuckle",
+  "2WD Spindle Knuckle",
+  "4WD Spindle Knuckle",
+];
+
+export const AXLE_ASSEMBLY_TYPES = [
+  "Front Axle Assembly",
+  "Rear Axle Assembly",
+  "Complete Axle Assembly",
+  "Dana 30 Axle Assembly",
+  "Dana 44 Axle Assembly",
+  "8.8 Ford Axle Assembly",
+  "12-Bolt Chevy Axle Assembly",
+  "Sterling 10.5 Axle Assembly",
+];
+
+export const ABS_ASSEMBLY_TYPES = [
+  "Front ABS Assembly",
+  "Rear ABS Assembly",
+  "Complete ABS Module",
+  "ABS Pump & Motor",
+  "ABS Control Module",
+  "ABS Wheel Speed Sensor",
+  "ABS Modulator Valve",
+];
+
+/** Convenience map: partSlug → type options array (used in LeadFormSection) */
+export const PART_TYPE_OPTIONS: Record<string, string[]> = {
+  "transmissions-for-sale":              TRANSMISSION_TYPES,
+  "engines-for-sale":                    ENGINE_TYPES,
+  "axle-shaft-for-sale":                 AXLE_SHAFT_TYPES,
+  "drive-shaft-for-sale":                DRIVE_SHAFT_TYPES,
+  "differential-for-sale":              DIFFERENTIAL_TYPES,
+  "speedometer-for-sale":               SPEEDOMETER_TYPES,
+  "throttle-body-for-sale":             THROTTLE_BODY_TYPES,
+  "transfer-case-assembly-for-sale":    TRANSFER_CASE_TYPES,
+  "steering-gear-rack-pinion-for-sale": STEERING_RACK_TYPES,
+  "intake-manifold-for-sale":           INTAKE_MANIFOLD_TYPES,
+  "steering-column-for-sale":           STEERING_COLUMN_TYPES,
+  "spindle-knuckle-for-sale":           SPINDLE_KNUCKLE_TYPES,
+  "axle-assembly-for-sale":             AXLE_ASSEMBLY_TYPES,
+  "abs-assembly-for-sale":              ABS_ASSEMBLY_TYPES,
+};
+
