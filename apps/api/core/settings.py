@@ -15,6 +15,13 @@ Environment variables for production:
 import os
 from pathlib import Path
 
+# Load .env file if present (production VPS uses this for DB credentials)
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+except ImportError:
+    pass  # dotenv not installed — fall back to system env vars
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get(
