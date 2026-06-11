@@ -162,6 +162,28 @@ PARTS_DATA = [
     "part_types": ["ABS Control Module","ABS Pump & Motor Assembly","ABS Wheel Speed Sensor","Complete ABS Assembly","Hydraulic Control Unit (HCU)"],
     "package_details": ["All ABS assemblies are inspected before delivery.","30 Days — Replacement or Refund."],
   },
+  {
+    "slug": "control-module-for-sale",
+    "name": "Control Module", "page_title": "ControlModuleForSale",
+    "hero_image": "/images/hero-transmission.jpg", "product_image": "/images/control-module.png",
+    "about_text": "At Control Module For Sale, we specialize in offering high-quality used and refurbished control modules for a variety of vehicles.",
+    "part_type_label": "Select Module Type",
+    "part_finder_title": "Find the right control module for your vehicle with our range of high-quality, tested options.",
+    "benefit_title": "Why Choose Us for Control Modules?",
+    "part_types": ["Engine Control Module (ECM)", "Transmission Control Module (TCM)", "Powertrain Control Module (PCM)", "Body Control Module (BCM)", "ABS Control Module"],
+    "package_details": ["All control modules are inspected for functionality.", "30 Days - Replacement or Refund."],
+  },
+  {
+    "slug": "engine-body-control-module-for-sale",
+    "name": "Engine / Body Control Module", "page_title": "EngineBodyControlModuleForSale",
+    "hero_image": "/images/hero-transmission.jpg", "product_image": "/images/control-module.png",
+    "about_text": "At Engine / Body Control Module For Sale, we specialize in offering high-quality used and refurbished engine and body control modules for a variety of vehicles.",
+    "part_type_label": "Select Module Type",
+    "part_finder_title": "Find the right control module for your vehicle with our range of high-quality, tested options.",
+    "benefit_title": "Why Choose Us for Control Modules?",
+    "part_types": ["Engine Control Module (ECM)", "Powertrain Control Module (PCM)", "Body Control Module (BCM)", "Transmission Control Module (TCM)", "ABS Control Module"],
+    "package_details": ["All control modules are inspected for functionality.", "30 Days - Replacement or Refund."],
+  },
 ]
 
 

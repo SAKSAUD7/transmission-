@@ -56,8 +56,9 @@ export default async function PartPage({ params }: Props) {
   const apiPart = await fetchPartFromApi(partSlug);
 
   // Merge: prefer API values for media fields, fall back to static data
-  const heroImage  = apiPart?.heroImage  || staticPart.heroImage;
-  const videoUrl   = apiPart?.videoUrl   || staticPart.videoUrl;
+  const heroImage    = apiPart?.heroImage    || staticPart.heroImage;
+  const videoUrl     = apiPart?.videoUrl     || staticPart.videoUrl;
+  const productImage = apiPart?.productImage || staticPart.productImage;
 
   // Resolve relative /media paths to absolute API URLs for Next.js <video> / <Image>
   const resolvedVideo = videoUrl?.startsWith("/media")
@@ -66,10 +67,14 @@ export default async function PartPage({ params }: Props) {
   const resolvedImage = heroImage?.startsWith("/media")
     ? `${API_BASE}${heroImage}`
     : heroImage;
+  const resolvedProductImage = productImage?.startsWith("/media")
+    ? `${API_BASE}${productImage}`
+    : productImage;
 
-  const partTypeOptions =
-    partSlug.includes("transmission") ? TRANSMISSION_TYPES :
-    partSlug.includes("engine") ? ENGINE_TYPES : GENERIC_TYPES;
+  const partTypeOptions = apiPart?.partTypes?.length
+    ? apiPart.partTypes
+    : partSlug.includes("transmission") ? TRANSMISSION_TYPES :
+      partSlug.includes("engine") ? ENGINE_TYPES : GENERIC_TYPES;
 
   return (
     <div style={{ paddingRight: 0 }}>
@@ -79,12 +84,12 @@ export default async function PartPage({ params }: Props) {
         headline={apiPart?.heroHeadline || staticPart.heroHeadline}
         subtitle={apiPart?.heroSubtitle || staticPart.heroSubtitle}
         slug={partSlug}
-        heroImage={staticPart.heroImage}
+        heroImage={resolvedImage}
       />
       <AboutSection
         aboutText={apiPart?.aboutText || staticPart.aboutText}
         aboutExtra={apiPart?.aboutExtra || staticPart.aboutExtra}
-        productImage={staticPart.productImage}
+        productImage={resolvedProductImage}
         productName={staticPart.name}
       />
       <LeadFormSection

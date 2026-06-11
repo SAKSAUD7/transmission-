@@ -28,7 +28,7 @@ class PartPageAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Identification", {"fields": ("slug", "name", "page_title", "is_active")}),
         ("Hero",           {"fields": ("hero_headline", "hero_subtitle", "hero_image", "hero_image_upload", "video_url", "hero_video_upload")}),
-        ("About Section",  {"fields": ("about_text", "about_extra", "product_image")}),
+        ("About Section",  {"fields": ("about_text", "about_extra", "product_image", "product_image_upload")}),
         ("Part Finder",    {"fields": ("part_type_label", "part_finder_title")}),
         ("Benefits",       {"fields": ("benefit_title",)}),
         ("360° Asset",     {"fields": ("asset_360_video", "asset_360_thumbnail", "asset_360_label")}),

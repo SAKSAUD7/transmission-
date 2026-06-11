@@ -24,6 +24,7 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 ALLOWED_HOSTS = ["*"]
+APPEND_SLASH = False   # Prevent Django redirect loops via the Next.js /api/* proxy
 
 # Trusted origins for CSRF — add your domain/IP here via env or directly
 _trusted = os.environ.get("CSRF_TRUSTED_ORIGINS", "")

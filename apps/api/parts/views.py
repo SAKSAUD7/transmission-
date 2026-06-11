@@ -33,7 +33,7 @@ def _serialize(page):
         "heroHeadline": page.hero_headline,
         "heroSubtitle": page.hero_subtitle,
         "heroImage": page.get_hero_image,
-        "productImage": page.product_image,
+        "productImage": page.get_product_image,
         "videoUrl": page.get_hero_video,
         "aboutText": page.about_text,
         "aboutExtra": page.about_extra,

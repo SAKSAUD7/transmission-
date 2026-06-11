@@ -10,6 +10,7 @@ class PartPage(models.Model):
     hero_image      = models.CharField(max_length=300, default="/images/hero.png", help_text="Legacy fallback image path")
     hero_image_upload = models.ImageField(upload_to="hero/images/", blank=True, null=True, help_text="Upload a hero background image")
     product_image   = models.CharField(max_length=300, blank=True)
+    product_image_upload = models.ImageField(upload_to="products/images/", blank=True, null=True, help_text="Upload a product image")
     video_url       = models.CharField(max_length=300, blank=True, help_text="Legacy fallback video URL")
     hero_video_upload = models.FileField(upload_to="hero/videos/", blank=True, null=True, help_text="Upload an MP4 hero background video")
     about_text      = models.TextField()
@@ -68,6 +69,12 @@ class PartPage(models.Model):
         if self.hero_image_upload:
             return self.hero_image_upload.url
         return self.hero_image
+
+    @property
+    def get_product_image(self):
+        if self.product_image_upload:
+            return self.product_image_upload.url
+        return self.product_image
 
 
 class PartType(models.Model):
