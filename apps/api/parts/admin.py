@@ -27,7 +27,7 @@ class PartPageAdmin(admin.ModelAdmin):
     inlines = [PartTypeInline, PackageDetailInline]
     fieldsets = [
         ("Identification", {"fields": ["slug", "name", "page_title", "is_active"]}),
-        ("Hero",           {"fields": ["hero_headline", "hero_subtitle", "hero_image", "video_url"]}),
+        ("Hero",           {"fields": ["hero_headline", "hero_subtitle", "hero_image", "hero_image_upload", "video_url", "hero_video_upload"]}),
         ("About Section",  {"fields": ["about_text", "about_extra", "product_image"]}),
         ("Part Finder",    {"fields": ["part_type_label", "part_finder_title"]}),
         ("Benefits",       {"fields": ["benefit_title"]}),

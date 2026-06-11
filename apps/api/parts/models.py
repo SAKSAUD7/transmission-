@@ -7,9 +7,11 @@ class PartPage(models.Model):
     page_title      = models.CharField(max_length=200)
     hero_headline   = models.TextField(default="Get the Lowest Prices on\nUsed Parts!")
     hero_subtitle   = models.CharField(max_length=300, default="Save Up to 50% Off Dealer Prices with Fast Shipping!")
-    hero_image      = models.CharField(max_length=300, default="/images/hero.png")
+    hero_image      = models.CharField(max_length=300, default="/images/hero.png", help_text="Legacy fallback image path")
+    hero_image_upload = models.ImageField(upload_to="hero/images/", blank=True, null=True, help_text="Upload a hero background image")
     product_image   = models.CharField(max_length=300, blank=True)
-    video_url       = models.CharField(max_length=300, blank=True, help_text="Legacy hero video URL")
+    video_url       = models.CharField(max_length=300, blank=True, help_text="Legacy fallback video URL")
+    hero_video_upload = models.FileField(upload_to="hero/videos/", blank=True, null=True, help_text="Upload an MP4 hero background video")
     about_text      = models.TextField()
     about_extra     = models.TextField(blank=True)
     part_type_label = models.CharField(max_length=100)
@@ -54,6 +56,18 @@ class PartPage(models.Model):
         if self.asset_360_thumbnail:
             return self.asset_360_thumbnail.url
         return None
+
+    @property
+    def get_hero_video(self):
+        if self.hero_video_upload:
+            return self.hero_video_upload.url
+        return self.video_url
+
+    @property
+    def get_hero_image(self):
+        if self.hero_image_upload:
+            return self.hero_image_upload.url
+        return self.hero_image
 
 
 class PartType(models.Model):
