@@ -25,6 +25,15 @@ SECRET_KEY = os.environ.get(
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 ALLOWED_HOSTS = ["*"]
 
+# Trusted origins for CSRF — add your domain/IP here via env or directly
+_trusted = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in _trusted.split(",") if o.strip()] or [
+    "http://2.25.151.68:8080",
+    "http://2.25.151.68",
+    "http://localhost:3000",
+    "http://localhost:8000",
+]
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
