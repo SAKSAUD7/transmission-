@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import PartPage, PartType, PackageDetail
+from .models import PartPage, PartType, PackageDetail, Partner
 
 
 class PartTypeInline(admin.TabularInline):
@@ -65,3 +65,12 @@ class PartTypeAdmin(admin.ModelAdmin):
         )
     asset_count.short_description = "360° Assets"
     asset_count.allow_tags = True
+
+
+@admin.register(Partner)
+class PartnerAdmin(admin.ModelAdmin):
+    list_display  = ["label", "name", "is_active", "order"]
+    list_filter   = ["is_active"]
+    search_fields = ["name", "label", "tagline"]
+    list_editable = ["is_active", "order"]
+    ordering      = ["order", "name"]

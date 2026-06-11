@@ -43,3 +43,23 @@ def _serialize(page):
         "partTypes": [t.label for t in page.part_types.all()],
         "packageDetails": [d.detail_text for d in page.package_details.all()],
     }
+
+
+@require_http_methods(["GET"])
+def partners_list(request):
+    from .models import Partner
+    partners = Partner.objects.filter(is_active=True).order_by("order", "name")
+    data = [
+        {
+            "name": p.name,
+            "label": p.label,
+            "tagline": p.tagline,
+            "accent": p.accent_color,
+            "logo": p.logo.url if p.logo else "",
+            "desc": p.description,
+        }
+        for p in partners
+    ]
+    r = JsonResponse(data, safe=False)
+    r["Access-Control-Allow-Origin"] = "*"
+    return r

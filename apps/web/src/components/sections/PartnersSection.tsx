@@ -1,11 +1,21 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { API_BASE } from "@/lib/api";
+
+export interface Partner {
+  name: string;
+  label: string;
+  tagline: string;
+  accent: string;
+  logo: string;
+  desc: string;
+}
 
 /* ─────────────────────── PARTNER DATA ─────────────────────────────────── */
-const PARTNERS = [
+const DEFAULT_PARTNERS: Partner[] = [
   {
     name: "SUZUKI",
     label: "Suzuki",
@@ -66,11 +76,23 @@ const PARTNERS = [
 
 /* ─────────────────────── SECTION ───────────────────────────────────────── */
 export default function PartnersSection() {
-  const [active, setActive] = useState(3); // Default: Lamborghini
+  const [partners, setPartners] = useState<Partner[]>(DEFAULT_PARTNERS);
+  const [active, setActive] = useState(0); 
 
-  const prev     = () => setActive(a => (a - 1 + PARTNERS.length) % PARTNERS.length);
-  const next     = () => setActive(a => (a + 1) % PARTNERS.length);
-  const featured = PARTNERS[active];
+  useEffect(() => {
+    fetch(`${API_BASE}/api/parts/partners/`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          setPartners(data);
+        }
+      })
+      .catch(err => console.error("Failed to fetch partners:", err));
+  }, []);
+
+  const prev     = () => setActive(a => (a - 1 + partners.length) % partners.length);
+  const next     = () => setActive(a => (a + 1) % partners.length);
+  const featured = partners[active] || DEFAULT_PARTNERS[0];
 
   return (
     <section className="partners">
@@ -80,7 +102,7 @@ export default function PartnersSection() {
 
         {/* ── Logo row ── */}
         <div className="partners-logos">
-          {PARTNERS.map((p, i) => {
+          {partners.map((p, i) => {
             const isActive = i === active;
             return (
               <button
@@ -113,7 +135,7 @@ export default function PartnersSection() {
                   }}
                 >
                   <Image
-                    src={p.logo}
+                    src={p.logo.startsWith("/") && !p.logo.startsWith("/images") ? `${API_BASE}${p.logo}` : p.logo}
                     alt={p.label}
                     width={isActive ? 108 : 64}
                     height={isActive ? 108 : 64}
@@ -171,7 +193,7 @@ export default function PartnersSection() {
             <ChevronLeft size={18} color="#374151" />
           </button>
           <div className="partners-dots">
-            {PARTNERS.map((_, i) => (
+            {partners.map((_, i) => (
               <motion.button
                 key={i}
                 className="partners-dot"

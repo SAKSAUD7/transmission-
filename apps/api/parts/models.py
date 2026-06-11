@@ -84,3 +84,23 @@ class PackageDetail(models.Model):
 
     def __str__(self):
         return f"{self.part_page.name} → {self.detail_text[:50]}"
+
+
+class Partner(models.Model):
+    """Companies that are partnered with us."""
+    name         = models.CharField(max_length=100, unique=True, help_text="Internal name (e.g., SUZUKI)")
+    label        = models.CharField(max_length=100, help_text="Display name (e.g., Suzuki)")
+    tagline      = models.CharField(max_length=200, blank=True, help_text="Short tagline (e.g., Way of Life!)")
+    accent_color = models.CharField(max_length=20, default="#000000", help_text="Hex color code (e.g., #003087)")
+    logo         = models.ImageField(upload_to="partners/logos/", help_text="Partner logo image")
+    description  = models.TextField(blank=True, help_text="Detailed description of the partner")
+    is_active    = models.BooleanField(default=True)
+    order        = models.PositiveIntegerField(default=0, help_text="Lower numbers appear first")
+
+    class Meta:
+        ordering = ["order", "name"]
+        verbose_name = "Partner"
+        verbose_name_plural = "Partners"
+
+    def __str__(self):
+        return self.label
