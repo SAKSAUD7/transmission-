@@ -7,35 +7,39 @@ interface HeroProps {
   headline: string;
   subtitle: string;
   heroImage?: string;
-  slug: string;               // part slug — used to fetch live video from Django
-  fallbackVideoUrl?: string;  // static fallback (usually empty now)
+  slug?: string;       // if provided → fetch live video from Django API
+  videoUrl?: string;   // direct fallback (for homepage or static use)
 }
 
 export default function HeroSection({
-  headline, subtitle, heroImage = "/images/hero.png", slug, fallbackVideoUrl,
+  headline, subtitle, heroImage = "/images/hero.png", slug, videoUrl: directVideoUrl,
 }: HeroProps) {
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!slug) return;
-    // Fetch fresh video URL from Django via Nginx proxy (/api/* → Django)
-    fetch(`/api/parts/${slug}/`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data?.videoUrl) {
-          // /media/... paths are served by Nginx at the same origin
-          const url = data.videoUrl.startsWith("/media")
-            ? `${window.location.origin}${data.videoUrl}`
-            : data.videoUrl;
-          setVideoSrc(url);
-        } else if (fallbackVideoUrl) {
-          setVideoSrc(fallbackVideoUrl);
-        }
-      })
-      .catch(() => {
-        if (fallbackVideoUrl) setVideoSrc(fallbackVideoUrl);
-      });
-  }, [slug, fallbackVideoUrl]);
+    if (slug) {
+      // Fetch fresh video URL from Django via Nginx proxy (/api/* → Django)
+      fetch(`/api/parts/${slug}/`)
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data?.videoUrl) {
+            // /media/... paths are served by Nginx at the same origin
+            const url = data.videoUrl.startsWith("/media")
+              ? `${window.location.origin}${data.videoUrl}`
+              : data.videoUrl;
+            setVideoSrc(url);
+          } else if (directVideoUrl) {
+            setVideoSrc(directVideoUrl);
+          }
+        })
+        .catch(() => {
+          if (directVideoUrl) setVideoSrc(directVideoUrl);
+        });
+    } else if (directVideoUrl) {
+      // No slug — use directly provided videoUrl (homepage etc.)
+      setVideoSrc(directVideoUrl);
+    }
+  }, [slug, directVideoUrl]);
 
   return (
     <section className="hero">

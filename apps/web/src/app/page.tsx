@@ -40,7 +40,7 @@ export default function TransmissionsPage() {
       <HeroSection
         headline={"Get the Lowest Prices on\nUsed Parts!"}
         subtitle="Save Up to 50% Off Dealer Prices with Fast Shipping!"
-        videoUrl="/videos/gearbox.mp4"
+        slug="transmissions-for-sale"
       />
 
       <AboutSection
