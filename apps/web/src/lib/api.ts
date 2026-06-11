@@ -6,8 +6,9 @@
  * Prod: NEXT_PUBLIC_API_URL="" (empty / not set)
  *       → relative URLs, Nginx proxies /api/* and /media/* → Django
  */
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
-
+export const API_BASE = typeof window !== 'undefined' 
+  ? "" 
+  : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000");
 export interface LeadPayload {
   fullName:   string;
   phone?:     string;
