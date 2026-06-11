@@ -56,6 +56,9 @@ apps/web/public/videos/*.mp4
 # Russian-named engine video
 *.mp4
 
+!apps/web/public/videos/engine.mp4
+!apps/web/public/videos/gearbox.mp4
+
 # Django generated/collected static files
 apps/api/staticfiles/
 
