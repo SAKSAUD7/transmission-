@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Search, Menu, X, Phone } from "lucide-react";
 
 const NAV = [
-  { href: "/",          label: "Home" },
+  { href: "#",          label: "Home" },
   { href: "#about",     label: "About Us" },
   { href: "#lead-form", label: "Parts Catalog" },
   { href: "#contact",   label: "Contact Us" },
@@ -18,7 +18,7 @@ export default function Navbar({ brand = "TransmissionsForSale" }: { brand?: str
     <header className="navbar">
       <div className="navbar-inner">
         {/* Logo */}
-        <Link href="/" className="navbar-logo">
+        <Link href="#" className="navbar-logo">
           <div className="navbar-diamond">
             <div className="navbar-diamond-inner" />
           </div>

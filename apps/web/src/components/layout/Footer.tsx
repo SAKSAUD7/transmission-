@@ -9,7 +9,7 @@ interface FooterProps {
 }
 
 const NAV_LINKS = [
-  { href: "/",          label: "Home" },
+  { href: "#",          label: "Home" },
   { href: "#lead-form", label: "Parts Catalog" },
   { href: "#about",     label: "About Us" },
   { href: "#contact",   label: "Contact Us" },
