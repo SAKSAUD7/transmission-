@@ -80,12 +80,12 @@ WSGI_APPLICATION = "core.wsgi.application"
 # Dev: SQLite  |  Prod: set DB_ENGINE=django.db.backends.mysql + other vars
 DATABASES = {
     "default": {
-        "ENGINE":   os.environ.get("DB_ENGINE",   "django.db.backends.sqlite3"),
-        "NAME":     os.environ.get("DB_NAME",     str(BASE_DIR / "db.sqlite3")),
-        "USER":     os.environ.get("DB_USER",     ""),
-        "PASSWORD": os.environ.get("DB_PASSWORD", ""),
-        "HOST":     os.environ.get("DB_HOST",     ""),
-        "PORT":     os.environ.get("DB_PORT",     ""),
+        "ENGINE":   os.environ.get("DB_ENGINE")   or "django.db.backends.sqlite3",
+        "NAME":     os.environ.get("DB_NAME")     or str(BASE_DIR / "db.sqlite3"),
+        "USER":     os.environ.get("DB_USER")     or "",
+        "PASSWORD": os.environ.get("DB_PASSWORD") or "",
+        "HOST":     os.environ.get("DB_HOST")     or "",
+        "PORT":     os.environ.get("DB_PORT")     or "",
     }
 }
 
