@@ -171,7 +171,7 @@ export default function AdminPortal() {
           <span style={{ fontWeight:800, fontSize:15, letterSpacing:"0.05em" }}>TRANSMISSION ADMIN</span>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-          {loading && <span style={{ color:"#6b7280", fontSize:13 }}>Loading…</span>}
+          {loading && <span style={{ color:"#6b7280", fontSize:13 }}>Loadingï¿½</span>}
           <button onClick={() => loadAll()} style={{ background:"#1f2937", border:"none", color:"#9ca3af", padding:"6px 14px", borderRadius:8, cursor:"pointer", fontSize:13 }}>? Refresh</button>
           <button onClick={() => { clearToken(); setAuthed(false); }} style={{ background:"#1f2937", border:"none", color:"#9ca3af", padding:"6px 14px", borderRadius:8, cursor:"pointer", fontSize:13 }}>Sign Out</button>
         </div>
@@ -190,7 +190,7 @@ export default function AdminPortal() {
 
         {/* -- Main content ----------------------------------------- */}
         <div style={{ flex:1, padding:"32px", overflowX:"auto" }}>
-          {msg && <div style={{ background:"#1f2937", borderRadius:10, padding:"10px 16px", marginBottom:20, fontSize:13, color:"#d1d5db" }}>{msg} <button onClick={() => setMsg("")} style={{ background:"none", border:"none", color:"#6b7280", cursor:"pointer", marginLeft:8 }}>×</button></div>}
+          {msg && <div style={{ background:"#1f2937", borderRadius:10, padding:"10px 16px", marginBottom:20, fontSize:13, color:"#d1d5db" }}>{msg} <button onClick={() => setMsg("")} style={{ background:"none", border:"none", color:"#6b7280", cursor:"pointer", marginLeft:8 }}>ï¿½</button></div>}
 
           {/* -- DASHBOARD ---------------------------------------- */}
           {tab === "dashboard" && stats && (
@@ -210,7 +210,7 @@ export default function AdminPortal() {
                 <div style={{ background:"#1f2937", borderRadius:99, height:12, overflow:"hidden" }}>
                   <div style={{ background:"linear-gradient(90deg,#2563eb,#7c3aed)", width:`${stats.coverage_pct}%`, height:"100%", borderRadius:99, transition:"width 0.5s" }} />
                 </div>
-                <p style={{ color:"#6b7280", fontSize:13, marginTop:10 }}>{stats.coverage_pct}% of all vehicle–page combinations are covered</p>
+                <p style={{ color:"#6b7280", fontSize:13, marginTop:10 }}>{stats.coverage_pct}% of all vehicleï¿½page combinations are covered</p>
               </div>
             </div>
           )}
@@ -218,20 +218,20 @@ export default function AdminPortal() {
           {/* -- UPLOAD ------------------------------------------- */}
           {tab === "upload" && (
             <div style={{ maxWidth:640 }}>
-              <h2 style={{ fontSize:24, fontWeight:800, marginBottom:24 }}>Upload 360° Asset</h2>
+              <h2 style={{ fontSize:24, fontWeight:800, marginBottom:24 }}>Upload 360ï¿½ Asset</h2>
               <form onSubmit={handleUpload} style={{ background:"#111827", border:"1px solid #1f2937", borderRadius:20, padding:32, display:"flex", flexDirection:"column", gap:20 }}>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
                   <div>
                     <label style={{ display:"block", color:"#9ca3af", fontSize:12, fontWeight:600, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Make *</label>
                     <select value={uMakeId} onChange={e => setUMakeId(e.target.value)} required style={sel}>
-                      <option value="">— Select Make —</option>
+                      <option value="">ï¿½ Select Make ï¿½</option>
                       {makes.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                     </select>
                   </div>
                   <div>
                     <label style={{ display:"block", color:"#9ca3af", fontSize:12, fontWeight:600, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Model</label>
                     <select value={uModelId} onChange={e => setUModelId(e.target.value)} style={sel} disabled={!uMakeId}>
-                      <option value="">— All models —</option>
+                      <option value="">ï¿½ All models ï¿½</option>
                       {models.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                     </select>
                   </div>
@@ -241,15 +241,15 @@ export default function AdminPortal() {
                   <div>
                     <label style={{ display:"block", color:"#9ca3af", fontSize:12, fontWeight:600, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Year</label>
                     <select value={uYear} onChange={e => setUYear(e.target.value)} style={sel}>
-                      <option value="">— All years —</option>
+                      <option value="">ï¿½ All years ï¿½</option>
                       {years.map(y => <option key={y} value={y}>{y}</option>)}
                     </select>
                   </div>
                   <div>
                     <label style={{ display:"block", color:"#9ca3af", fontSize:12, fontWeight:600, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Asset Type *</label>
                     <select value={uType} onChange={e => setUType(e.target.value as "car"|"part")} style={sel}>
-                      <option value="car">?? Car 360°</option>
-                      <option value="part">?? Part 360°</option>
+                      <option value="car">?? Car 360ï¿½</option>
+                      <option value="part">?? Part 360ï¿½</option>
                     </select>
                   </div>
                 </div>
@@ -258,7 +258,7 @@ export default function AdminPortal() {
                   <div>
                     <label style={{ display:"block", color:"#9ca3af", fontSize:12, fontWeight:600, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Part Page *</label>
                     <select value={uSlug} onChange={e => setUSlug(e.target.value)} required={uType === "part"} style={sel}>
-                      <option value="">— Select Part Page —</option>
+                      <option value="">ï¿½ Select Part Page ï¿½</option>
                       {PART_PAGES.map(([slug,label]) => <option key={slug} value={slug}>{label}</option>)}
                     </select>
                   </div>
@@ -266,12 +266,12 @@ export default function AdminPortal() {
 
                 <div>
                   <label style={{ display:"block", color:"#9ca3af", fontSize:12, fontWeight:600, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>Label / Display Name</label>
-                  <input value={uLabel} onChange={e => setULabel(e.target.value)} placeholder='e.g. "Toyota Camry 2024 — Transmission"' style={inp} />
+                  <input value={uLabel} onChange={e => setULabel(e.target.value)} placeholder='e.g. "Toyota Camry 2024 ï¿½ Transmission"' style={inp} />
                 </div>
 
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
                   <div>
-                    <label style={{ display:"block", color:"#9ca3af", fontSize:12, fontWeight:600, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>360° Video (MP4)</label>
+                    <label style={{ display:"block", color:"#9ca3af", fontSize:12, fontWeight:600, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>360ï¿½ Video (MP4)</label>
                     <input ref={videoRef} type="file" accept="video/mp4,video/*" onChange={e => setUVideo(e.target.files?.[0] ?? null)} style={{ ...inp, cursor:"pointer", padding:"10px 12px" }} />
                     {uVideo && <p style={{ color:"#34d399", fontSize:11, marginTop:4 }}>? {uVideo.name} ({(uVideo.size/1024/1024).toFixed(1)} MB)</p>}
                   </div>
@@ -285,7 +285,7 @@ export default function AdminPortal() {
                 {uMsg && <p style={{ fontSize:13, color: uMsg.startsWith("?") ? "#34d399" : "#f87171", padding:"10px 16px", background:"#1f2937", borderRadius:10 }}>{uMsg}</p>}
 
                 <button type="submit" disabled={uLoading} style={{ background:"linear-gradient(135deg,#2563eb,#7c3aed)", color:"#fff", border:"none", borderRadius:12, padding:"14px 24px", fontSize:15, fontWeight:700, cursor:"pointer", opacity: uLoading ? 0.7 : 1 }}>
-                  {uLoading ? "Uploading…" : "?? Upload Asset"}
+                  {uLoading ? "Uploadingï¿½" : "?? Upload Asset"}
                 </button>
               </form>
             </div>
@@ -296,7 +296,7 @@ export default function AdminPortal() {
             <div>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
                 <h2 style={{ fontSize:24, fontWeight:800, margin:0 }}>Asset List <span style={{ color:"#6b7280", fontWeight:400, fontSize:16 }}>({filteredAssets.length})</span></h2>
-                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search make, model, part…" style={{ ...inp, width:240, padding:"8px 14px" }} />
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search make, model, partï¿½" style={{ ...inp, width:240, padding:"8px 14px" }} />
               </div>
               <div style={{ overflowX:"auto" }}>
                 <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
@@ -318,8 +318,8 @@ export default function AdminPortal() {
                             {a.asset_type === "car" ? "?? Car" : "?? Part"}
                           </span>
                         </td>
-                        <td style={td}>{a.part_label || <span style={{ color:"#4b5563" }}>—</span>}</td>
-                        <td style={{ ...td, maxWidth:160, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{a.label || <span style={{ color:"#4b5563" }}>—</span>}</td>
+                        <td style={td}>{a.part_label || <span style={{ color:"#4b5563" }}>ï¿½</span>}</td>
+                        <td style={{ ...td, maxWidth:160, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{a.label || <span style={{ color:"#4b5563" }}>ï¿½</span>}</td>
                         <td style={td}>
                           {a.has_video
                             ? <span style={{ color:"#34d399", fontWeight:700 }}>? Video</span>
@@ -358,7 +358,7 @@ export default function AdminPortal() {
                   <thead>
                     <tr style={{ background:"#111827" }}>
                       <th style={{ ...th, textAlign:"left", minWidth:160 }}>Vehicle</th>
-                      <th style={th}>Car 360°</th>
+                      <th style={th}>Car 360ï¿½</th>
                       {coverage.part_pages.map(p => <th key={p.slug} style={{ ...th, fontSize:10 }} title={p.slug}>{p.label}</th>)}
                       <th style={th}>Score</th>
                     </tr>
@@ -374,7 +374,7 @@ export default function AdminPortal() {
                           <span style={{ fontSize:14 }}>{statusIcon(row.car_status)}</span>
                         </td>
                         {row.page_cells.map(cell => (
-                          <td key={cell.slug} style={{ textAlign:"center", padding:6, background: cell.status === "ok" ? "#052e16" : cell.status === "inactive" ? "#1c1408" : "#1a0000" }} title={`${row.make} ${row.model} — ${cell.label}`}>
+                          <td key={cell.slug} style={{ textAlign:"center", padding:6, background: cell.status === "ok" ? "#052e16" : cell.status === "inactive" ? "#1c1408" : "#1a0000" }} title={`${row.make} ${row.model} ï¿½ ${cell.label}`}>
                             <span style={{ fontSize:13 }}>{statusIcon(cell.status)}</span>
                           </td>
                         ))}
