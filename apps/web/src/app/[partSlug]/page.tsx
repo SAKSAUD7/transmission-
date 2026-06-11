@@ -22,7 +22,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 async function fetchPartFromApi(slug: string) {
   try {
     const res = await fetch(`${API_BASE}/api/parts/${slug}/`, {
-      next: { revalidate: 60 },
+      cache: "no-store",  // Always fresh — instant after Django Admin uploads
     });
     if (!res.ok) return null;
     return await res.json();
