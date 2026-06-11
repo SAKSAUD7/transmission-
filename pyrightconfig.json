@@ -11,5 +11,6 @@
   "venvPath": "apps/api",
   "venv": "venv",
   "reportMissingImports": "warning",
-  "reportMissingModuleSource": "none"
+  "reportMissingModuleSource": "none",
+  "reportMissingTypeStubs": "none"
 }
