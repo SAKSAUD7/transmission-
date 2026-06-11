@@ -76,8 +76,6 @@ DATABASES = {
         "PASSWORD": os.environ.get("DB_PASSWORD", ""),
         "HOST":     os.environ.get("DB_HOST",     ""),
         "PORT":     os.environ.get("DB_PORT",     ""),
-        # MySQL charset — ignored by SQLite
-        "OPTIONS":  {"charset": "utf8mb4"} if os.environ.get("DB_ENGINE", "").endswith("mysql") else {},
     }
 }
 
