@@ -1,22 +1,47 @@
 "use client";
 import Image from "next/image";
 import { Phone } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface HeroProps {
   headline: string;
   subtitle: string;
-  videoUrl?: string;
   heroImage?: string;
+  slug: string;               // part slug — used to fetch live video from Django
+  fallbackVideoUrl?: string;  // static fallback (usually empty now)
 }
 
 export default function HeroSection({
-  headline, subtitle, videoUrl, heroImage = "/images/hero.png",
+  headline, subtitle, heroImage = "/images/hero.png", slug, fallbackVideoUrl,
 }: HeroProps) {
+  const [videoSrc, setVideoSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!slug) return;
+    // Fetch fresh video URL from Django via Nginx proxy (/api/* → Django)
+    fetch(`/api/parts/${slug}/`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.videoUrl) {
+          // /media/... paths are served by Nginx at the same origin
+          const url = data.videoUrl.startsWith("/media")
+            ? `${window.location.origin}${data.videoUrl}`
+            : data.videoUrl;
+          setVideoSrc(url);
+        } else if (fallbackVideoUrl) {
+          setVideoSrc(fallbackVideoUrl);
+        }
+      })
+      .catch(() => {
+        if (fallbackVideoUrl) setVideoSrc(fallbackVideoUrl);
+      });
+  }, [slug, fallbackVideoUrl]);
+
   return (
     <section className="hero">
-      {/* Background */}
-      {videoUrl ? (
-        <video src={videoUrl} autoPlay muted loop playsInline className="hero-video" />
+      {/* Background — video if available, otherwise fallback image */}
+      {videoSrc ? (
+        <video src={videoSrc} autoPlay muted loop playsInline className="hero-video" />
       ) : (
         <Image src={heroImage} alt="Auto Parts" fill style={{ objectFit: "cover", opacity: 0.65 }} priority />
       )}

@@ -70,7 +70,7 @@ export default async function PartTypePage({ params }: Props) {
       <HeroSection
         headline={headline}
         subtitle={subtitle}
-        videoUrl={part.videoUrl}
+        slug={partSlug}
         heroImage={part.heroImage}
       />
 

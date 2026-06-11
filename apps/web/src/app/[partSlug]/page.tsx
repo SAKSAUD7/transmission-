@@ -78,8 +78,8 @@ export default async function PartPage({ params }: Props) {
       <HeroSection
         headline={apiPart?.heroHeadline || staticPart.heroHeadline}
         subtitle={apiPart?.heroSubtitle || staticPart.heroSubtitle}
-        videoUrl={resolvedVideo}
-        heroImage={resolvedImage}
+        slug={partSlug}
+        heroImage={staticPart.heroImage}
       />
       <AboutSection
         aboutText={apiPart?.aboutText || staticPart.aboutText}
