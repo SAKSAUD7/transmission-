@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import { Phone } from "lucide-react";
-import { API_BASE } from "@/lib/api";
 
 interface HeroProps {
   headline: string;
@@ -13,16 +12,13 @@ interface HeroProps {
 export default function HeroSection({
   headline, subtitle, videoUrl, heroImage = "/images/hero.png",
 }: HeroProps) {
-  const resolvedVideo = videoUrl?.startsWith("/media") ? `${API_BASE}${videoUrl}` : videoUrl;
-  const resolvedImage = heroImage?.startsWith("/media") ? `${API_BASE}${heroImage}` : heroImage;
-
   return (
     <section className="hero">
       {/* Background */}
-      {resolvedVideo ? (
-        <video src={resolvedVideo} autoPlay muted loop playsInline className="hero-video" />
+      {videoUrl ? (
+        <video src={videoUrl} autoPlay muted loop playsInline className="hero-video" />
       ) : (
-        <Image src={resolvedImage} alt="Auto Parts" fill style={{ objectFit: "cover", opacity: 0.65 }} priority />
+        <Image src={heroImage} alt="Auto Parts" fill style={{ objectFit: "cover", opacity: 0.65 }} priority />
       )}
 
       {/* Gradient overlay */}

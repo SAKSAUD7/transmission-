@@ -31,3 +31,14 @@ export async function postLead(payload: LeadPayload): Promise<boolean> {
   });
   return res.ok || res.status === 201;
 }
+
+export async function getPart(slug: string): Promise<any | null> {
+  try {
+    const res = await fetch(`${API_BASE}/api/parts/${slug}/`, { next: { revalidate: 60 } });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to fetch part:", err);
+    return null;
+  }
+}

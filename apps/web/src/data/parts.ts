@@ -22,7 +22,7 @@ export const parts: PartConfig[] = [
       "Joint Replacement — the torque converter will only be refunded with automatic transmissions.",
       "Transmissions will be inspected for shavings before delivery.",
     ],
-    videoUrl: "/videos/gearbox.mp4",
+    videoUrl: "",
     seo: {
       title: "Transmissions For Sale | Best Prices on Used Transmissions",
       description:
@@ -51,7 +51,7 @@ export const parts: PartConfig[] = [
       "All engines are tested for performance before delivery.",
       "30 Days — Replacement or Refund.",
     ],
-    videoUrl: "/videos/engine.mp4",
+    videoUrl: "",
     seo: {
       title: "Engines For Sale | Best Prices on Used Engines",
       description:

@@ -16,6 +16,21 @@ import LeadFormSidebar from "@/components/forms/LeadFormSidebar";
 
 const GENERIC_TYPES = ["Standard / OEM", "Premium", "Aftermarket", "Remanufactured", "Used / Tested"];
 
+// Server-side Django fetch — runs at request time (ISR: revalidate every 60s)
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+async function fetchPartFromApi(slug: string) {
+  try {
+    const res = await fetch(`${API_BASE}/api/parts/${slug}/`, {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
 interface Props { params: Promise<{ partSlug: string }> }
 
 export async function generateStaticParams() {
@@ -34,8 +49,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PartPage({ params }: Props) {
   const { partSlug } = await params;
-  const part = getPartBySlug(partSlug);
-  if (!part) notFound();
+  const staticPart = getPartBySlug(partSlug);
+  if (!staticPart) notFound();
+
+  // Fetch live data from Django (has uploaded video/image URLs)
+  const apiPart = await fetchPartFromApi(partSlug);
+
+  // Merge: prefer API values for media fields, fall back to static data
+  const heroImage  = apiPart?.heroImage  || staticPart.heroImage;
+  const videoUrl   = apiPart?.videoUrl   || staticPart.videoUrl;
+
+  // Resolve relative /media paths to absolute API URLs for Next.js <video> / <Image>
+  const resolvedVideo = videoUrl?.startsWith("/media")
+    ? `${API_BASE}${videoUrl}`
+    : videoUrl;
+  const resolvedImage = heroImage?.startsWith("/media")
+    ? `${API_BASE}${heroImage}`
+    : heroImage;
 
   const partTypeOptions =
     partSlug.includes("transmission") ? TRANSMISSION_TYPES :
@@ -43,33 +73,33 @@ export default async function PartPage({ params }: Props) {
 
   return (
     <div style={{ paddingRight: 0 }}>
-      <LeadFormSidebar partSlug={partSlug} sourcePage={part.slug} />
-      <Navbar brand={part.pageTitle} />
+      <LeadFormSidebar partSlug={partSlug} sourcePage={staticPart.slug} />
+      <Navbar brand={staticPart.pageTitle} />
       <HeroSection
-        headline={part.heroHeadline}
-        subtitle={part.heroSubtitle}
-        videoUrl={part.videoUrl}
-        heroImage={part.heroImage}
+        headline={apiPart?.heroHeadline || staticPart.heroHeadline}
+        subtitle={apiPart?.heroSubtitle || staticPart.heroSubtitle}
+        videoUrl={resolvedVideo}
+        heroImage={resolvedImage}
       />
       <AboutSection
-        aboutText={part.aboutText}
-        aboutExtra={part.aboutExtra}
-        productImage={part.productImage}
-        productName={part.name}
+        aboutText={apiPart?.aboutText || staticPart.aboutText}
+        aboutExtra={apiPart?.aboutExtra || staticPart.aboutExtra}
+        productImage={staticPart.productImage}
+        productName={staticPart.name}
       />
       <LeadFormSection
-        title={part.partFinderTitle}
-        partTypeLabel={part.partTypeLabel}
+        title={apiPart?.partFinderTitle || staticPart.partFinderTitle}
+        partTypeLabel={apiPart?.partTypeLabel || staticPart.partTypeLabel}
         partTypeOptions={partTypeOptions}
         partSlug={partSlug}
-        sourcePage={part.slug}
+        sourcePage={staticPart.slug}
       />
-      <BenefitsSection benefitTitle={part.benefitTitle} />
+      <BenefitsSection benefitTitle={apiPart?.benefitTitle || staticPart.benefitTitle} />
       <PartnersSection />
-      <WarrantySection productName={part.name} packageDetails={part.packageDetails} />
-      <ContactSection brand={part.pageTitle} />
-      <ReviewsSection partName={part.name} />
-      <Footer brand={part.pageTitle} />
+      <WarrantySection productName={staticPart.name} packageDetails={staticPart.packageDetails} />
+      <ContactSection brand={staticPart.pageTitle} />
+      <ReviewsSection partName={staticPart.name} />
+      <Footer brand={staticPart.pageTitle} />
     </div>
   );
 }
