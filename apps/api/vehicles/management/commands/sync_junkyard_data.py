@@ -28,33 +28,33 @@ class Command(BaseCommand):
         # Parse JSON
         for item in data:
             model_type = item.get("model", "").lower()
+            pk = item.get("pk")
             fields = item.get("fields", {})
 
             if model_type == "hollander.make":
                 make_name = fields.get("make_name")
-                make_id = fields.get("make_id")
-                if make_name and make_id is not None:
-                    makes_data[str(make_id)] = make_name
+                if make_name:
+                    makes_data[str(pk)] = make_name
 
             elif model_type == "hollander.model":
                 model_name = fields.get("model_name")
-                make_id = fields.get("make_id")
-                model_id = fields.get("model_id")
-                if model_name and make_id is not None and model_id is not None:
-                    models_data[str(model_id)] = {"name": model_name, "make_id": str(make_id)}
+                make_pk = fields.get("make") or fields.get("make_id") or fields.get("make_ref_id")
+                
+                if model_name and make_pk is not None:
+                    models_data[str(pk)] = {"name": model_name, "make_pk": str(make_pk)}
 
-            elif model_type in ["hollander.yearrange", "hollander.year_range"]:
+            elif model_type == "hollander.partpricing":
                 year_start = fields.get("year_start")
                 year_end = fields.get("year_end")
-                model_id = fields.get("model_id")
-                make_id = fields.get("make_id")
+                model_pk = fields.get("model") or fields.get("model_id") or fields.get("model_ref_id")
+                make_pk = fields.get("make") or fields.get("make_id") or fields.get("make_ref_id")
                 
-                if year_start and year_end and model_id is not None:
+                if year_start and year_end:
                     years_data.append({
                         "start": int(year_start),
                         "end": int(year_end),
-                        "model_id": str(model_id),
-                        "make_id": str(make_id) if make_id is not None else None
+                        "model_pk": str(model_pk) if model_pk is not None else None,
+                        "model_name": fields.get("model") if isinstance(fields.get("model"), str) else None
                     })
 
         if len(years_data) == 0:
@@ -77,15 +77,22 @@ class Command(BaseCommand):
         # Insert Models
         model_objects = {}
         for mod_id, mdata in models_data.items():
-            make_obj = make_objects.get(mdata["make_id"])
+            make_obj = make_objects.get(mdata["make_pk"])
             if make_obj:
                 model_objects[mod_id] = VehicleModel.objects.create(make=make_obj, name=mdata["name"])
 
         # Insert Years
         created_years = 0
         bulk_years = []
+        
+        model_name_to_obj = {obj.name.lower(): obj for obj in model_objects.values()}
+        
         for ydata in years_data:
-            model_obj = model_objects.get(ydata["model_id"])
+            model_obj = model_objects.get(ydata["model_pk"])
+            
+            if not model_obj and ydata.get("model_name"):
+                model_obj = model_name_to_obj.get(ydata["model_name"].lower())
+                
             if not model_obj:
                 continue
             
