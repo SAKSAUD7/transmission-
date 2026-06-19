@@ -42,8 +42,8 @@ def years_list(request):
     # Query the dedicated VehicleYear table for this exact Make + Model
     years = list(
         VehicleYear.objects.filter(
-            make__name=make_name,
-            model__name=model_name
+            make__name__iexact=make_name,
+            model__name__iexact=model_name
         ).values_list("year", flat=True).distinct()
     )
 
