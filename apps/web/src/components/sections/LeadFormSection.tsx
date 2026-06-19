@@ -58,7 +58,8 @@ export default function LeadFormSection({
 
   // API models take priority; fall back to static data
   const models    = apiModels.length > 0 ? apiModels : (make ? (CAR_MODELS_BY_MAKE[make] || []) : []);
-  const yearsList = apiYears.length > 0 ? apiYears : YEARS;
+  // Year ONLY comes from API (database) — no static fallback, must depend on make+model
+  const yearsList = apiYears;
   const partImage = getPartImage(partSlug);
 
 

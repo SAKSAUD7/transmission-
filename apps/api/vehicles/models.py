@@ -88,6 +88,26 @@ class VehicleModel(models.Model):
         return f"{self.make.name} {self.name}"
 
 
+class VehicleYear(models.Model):
+    """
+    Stores the valid years for a specific Make + Model combination.
+    Powers the dynamic Year dropdown in the Lead Form.
+    Managed via Django Admin or the seed_vehicle_years management command.
+    """
+    make  = models.ForeignKey(VehicleMake,  on_delete=models.CASCADE, related_name="years")
+    model = models.ForeignKey(VehicleModel, on_delete=models.CASCADE, related_name="years")
+    year  = models.CharField(max_length=10)
+
+    class Meta:
+        ordering        = ["make__name", "model__name", "-year"]
+        unique_together = [["make", "model", "year"]]
+        verbose_name    = "Vehicle Year"
+        verbose_name_plural = "Vehicle Years"
+
+    def __str__(self):
+        return f"{self.make.name} {self.model.name} — {self.year}"
+
+
 class Vehicle360Asset(models.Model):
     ASSET_TYPES = [
         ("car",  "Car 360° View"),

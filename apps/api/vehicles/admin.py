@@ -18,7 +18,7 @@ from django.utils.html import format_html
 from django import forms
 
 from .models import (
-    VehicleMake, VehicleModel,
+    VehicleMake, VehicleModel, VehicleYear,
     Vehicle360Asset, CarAsset, PartAsset,
     PART_PAGES, PART_PAGE_LABELS,
 )
@@ -279,6 +279,20 @@ class VehicleModelAdmin(admin.ModelAdmin):
         )
     car_asset_count.short_description = "Car Assets"
     car_asset_count.allow_tags = True
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ADMIN: Vehicle Year
+# ─────────────────────────────────────────────────────────────────────────────
+@admin.register(VehicleYear)
+class VehicleYearAdmin(admin.ModelAdmin):
+    list_display  = ["make", "model", "year"]
+    list_filter   = ["make", "year"]
+    search_fields = ["make__name", "model__name", "year"]
+    ordering      = ["make__name", "model__name", "-year"]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("make", "model")
 
 
 # ─────────────────────────────────────────────────────────────────────────────

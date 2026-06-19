@@ -1,7 +1,7 @@
 import json
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from .models import VehicleMake, VehicleModel, Vehicle360Asset
+from .models import VehicleMake, VehicleModel, Vehicle360Asset, VehicleYear
 
 
 @require_http_methods(["GET"])
@@ -31,25 +31,27 @@ def models_list(request):
 
 @require_http_methods(["GET"])
 def years_list(request):
-    make_name = request.GET.get("make", "").strip()
+    make_name  = request.GET.get("make",  "").strip()
     model_name = request.GET.get("model", "").strip()
 
-    qs = Vehicle360Asset.objects.exclude(year="")
-    if make_name:
-        qs = qs.filter(make__name=make_name)
-    if model_name:
-        qs = qs.filter(model__name=model_name)
+    if not make_name or not model_name:
+        r = JsonResponse([], safe=False)
+        r["Access-Control-Allow-Origin"] = "*"
+        return r
 
-    years = list(qs.values_list('year', flat=True).distinct())
-    
+    # Query the dedicated VehicleYear table for this exact Make + Model
+    years = list(
+        VehicleYear.objects.filter(
+            make__name=make_name,
+            model__name=model_name
+        ).values_list("year", flat=True).distinct()
+    )
+
+    # Sort numerically descending (newest first)
     try:
         years = sorted(years, key=lambda x: int(x), reverse=True)
     except ValueError:
         years.sort(reverse=True)
-
-    # Fallback if no specific years are found for this make/model in the DB
-    if not years:
-        years = [str(y) for y in range(2026, 1989, -1)]
 
     r = JsonResponse(years, safe=False)
     r["Access-Control-Allow-Origin"] = "*"
