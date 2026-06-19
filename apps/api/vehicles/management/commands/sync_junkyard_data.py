@@ -28,34 +28,38 @@ class Command(BaseCommand):
         # Parse JSON
         for item in data:
             model_type = item.get("model", "").lower()
-            pk = item.get("pk")
             fields = item.get("fields", {})
 
             if model_type == "hollander.make":
                 make_name = fields.get("make_name")
-                if make_name:
-                    makes_data[pk] = make_name
+                make_id = fields.get("make_id")
+                if make_name and make_id is not None:
+                    makes_data[str(make_id)] = make_name
 
             elif model_type == "hollander.model":
                 model_name = fields.get("model_name")
-                # Django dumpdata uses the exact FK field name without _id usually, but let's be safe
-                make_id = fields.get("make") or fields.get("make_id")
-                if model_name and make_id:
-                    models_data[pk] = {"name": model_name, "make_pk": make_id}
+                make_id = fields.get("make_id")
+                model_id = fields.get("model_id")
+                if model_name and make_id is not None and model_id is not None:
+                    models_data[str(model_id)] = {"name": model_name, "make_id": str(make_id)}
 
             elif model_type in ["hollander.yearrange", "hollander.year_range"]:
                 year_start = fields.get("year_start")
                 year_end = fields.get("year_end")
-                model_id = fields.get("model") or fields.get("model_id")
-                make_id = fields.get("make") or fields.get("make_id")
+                model_id = fields.get("model_id")
+                make_id = fields.get("make_id")
                 
-                if year_start and year_end and model_id:
+                if year_start and year_end and model_id is not None:
                     years_data.append({
                         "start": int(year_start),
                         "end": int(year_end),
-                        "model_pk": model_id,
-                        "make_pk": make_id
+                        "model_id": str(model_id),
+                        "make_id": str(make_id) if make_id is not None else None
                     })
+
+        if len(years_data) == 0:
+            found_models = set(item.get("model", "").lower() for item in data)
+            self.stdout.write(self.style.WARNING(f"WARNING: 0 year ranges found! The available models in your JSON are: {', '.join(found_models)}"))
 
         self.stdout.write(self.style.SUCCESS(f"Found {len(makes_data)} makes, {len(models_data)} models, {len(years_data)} year ranges in JSON."))
 
@@ -67,21 +71,21 @@ class Command(BaseCommand):
 
         # Insert Makes
         make_objects = {}
-        for pk, name in makes_data.items():
-            make_objects[pk] = VehicleMake.objects.create(name=name)
+        for m_id, name in makes_data.items():
+            make_objects[m_id] = VehicleMake.objects.create(name=name)
         
         # Insert Models
         model_objects = {}
-        for pk, mdata in models_data.items():
-            make_obj = make_objects.get(mdata["make_pk"])
+        for mod_id, mdata in models_data.items():
+            make_obj = make_objects.get(mdata["make_id"])
             if make_obj:
-                model_objects[pk] = VehicleModel.objects.create(make=make_obj, name=mdata["name"])
+                model_objects[mod_id] = VehicleModel.objects.create(make=make_obj, name=mdata["name"])
 
         # Insert Years
         created_years = 0
         bulk_years = []
         for ydata in years_data:
-            model_obj = model_objects.get(ydata["model_pk"])
+            model_obj = model_objects.get(ydata["model_id"])
             if not model_obj:
                 continue
             
