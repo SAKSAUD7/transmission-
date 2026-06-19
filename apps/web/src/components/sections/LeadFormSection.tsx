@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, CheckCircle } from "lucide-react";
-import { CAR_MAKES, CAR_MODELS_BY_MAKE, YEARS } from "@/data/vehicles";
+import { CAR_MAKES, CAR_MODELS_BY_MAKE } from "@/data/vehicles";
 import { getPartImage } from "@/data/vehicleImages";
 import VehicleCreative from "@/components/ui/VehicleCreative";
 import { postLead, API_BASE } from "@/lib/api";
