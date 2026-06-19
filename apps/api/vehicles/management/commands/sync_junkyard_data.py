@@ -69,7 +69,7 @@ class Command(BaseCommand):
         make_objects_by_pk = {}
         make_objects_by_custom = {}
         for m in makes_data:
-            obj = VehicleMake.objects.create(name=m["name"])
+            obj, _ = VehicleMake.objects.get_or_create(name=m["name"])
             make_objects_by_pk[m["pk"]] = obj
             if m["make_id"] and m["make_id"] != "None":
                 make_objects_by_custom[m["make_id"]] = obj
@@ -80,7 +80,7 @@ class Command(BaseCommand):
         for m in models_data:
             make_obj = make_objects_by_pk.get(m["make_fk"]) or make_objects_by_custom.get(m["make_fk"])
             if make_obj:
-                obj = VehicleModel.objects.create(make=make_obj, name=m["name"])
+                obj, _ = VehicleModel.objects.get_or_create(make=make_obj, name=m["name"])
                 model_objects_by_pk[m["pk"]] = obj
                 if m["model_id"] and m["model_id"] != "None":
                     model_objects_by_custom[m["model_id"]] = obj
