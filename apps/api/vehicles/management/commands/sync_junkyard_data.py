@@ -110,4 +110,20 @@ class Command(BaseCommand):
             VehicleYear.objects.bulk_create(bulk_years[i:i+batch_size], ignore_conflicts=True)
             created_years += len(bulk_years[i:i+batch_size])
 
-        self.stdout.write(self.style.SUCCESS(f"Done! Inserted {len(make_objects_by_pk)} makes, {len(model_objects_by_pk)} models, and {created_years} individual year records to exactly match Junkyard!"))
+        # FALLBACK: The JSON dump is missing the 'hollander.year_range' table! 
+        # partpricing only gave us years for models that have priced parts.
+        # For any model that ended up with NO years, we will generate standard years
+        # so the frontend dropdowns don't break!
+        empty_models = VehicleModel.objects.filter(years__isnull=True)
+        fallback_years = []
+        for model in empty_models:
+            for yr in range(1980, 2025):
+                fallback_years.append(VehicleYear(make=model.make, model=model, year=str(yr)))
+        
+        if fallback_years:
+            self.stdout.write(self.style.WARNING(f"WARNING: The JSON dump was missing the year_range table! Adding {len(fallback_years)} fallback years for empty models."))
+            for i in range(0, len(fallback_years), batch_size):
+                VehicleYear.objects.bulk_create(fallback_years[i:i+batch_size], ignore_conflicts=True)
+
+        total_years = VehicleYear.objects.count()
+        self.stdout.write(self.style.SUCCESS(f"Done! Inserted {len(make_objects_by_pk)} makes, {len(model_objects_by_pk)} models, and {total_years} individual year records to exactly match Junkyard!"))
