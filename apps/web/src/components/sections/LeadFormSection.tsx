@@ -28,6 +28,10 @@ export default function LeadFormSection({
   const [apiModels,     setApiModels]     = useState<string[]>([]);
   const [modelsLoading, setModelsLoading] = useState(false);
 
+  // ── Dynamic year loading: API first, static fallback ─────────────────────
+  const [apiYears,     setApiYears]     = useState<string[]>([]);
+  const [yearsLoading, setYearsLoading] = useState(false);
+
   useEffect(() => {
     if (!make) { setApiModels([]); return; }
     setModelsLoading(true);
@@ -40,8 +44,21 @@ export default function LeadFormSection({
       .finally(() => setModelsLoading(false));
   }, [make]);
 
+  useEffect(() => {
+    if (!make || !model) { setApiYears([]); return; }
+    setYearsLoading(true);
+    fetch(`${API_BASE}/api/vehicles/years/?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}`)
+      .then(r => r.json())
+      .then((data: string[]) => {
+        setApiYears(Array.isArray(data) && data.length > 0 ? data : []);
+      })
+      .catch(() => setApiYears([]))
+      .finally(() => setYearsLoading(false));
+  }, [make, model]);
+
   // API models take priority; fall back to static data
   const models    = apiModels.length > 0 ? apiModels : (make ? (CAR_MODELS_BY_MAKE[make] || []) : []);
+  const yearsList = apiYears.length > 0 ? apiYears : YEARS;
   const partImage = getPartImage(partSlug);
 
 
@@ -105,9 +122,16 @@ export default function LeadFormSection({
 
             <div>
               <label className="lead-label">Select Vehicle Year</label>
-              <select className="lead-select" value={year} onChange={e => setYear(e.target.value)}>
-                <option value="">Select Vehicle Year</option>
-                {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+              <select 
+                className="lead-select" 
+                value={year} 
+                onChange={e => setYear(e.target.value)}
+                disabled={!model || yearsLoading}
+              >
+                <option value="">
+                  {yearsLoading ? "Loading years…" : "Select Vehicle Year"}
+                </option>
+                {yearsList.map(y => <option key={y} value={y}>{y}</option>)}
               </select>
             </div>
 
