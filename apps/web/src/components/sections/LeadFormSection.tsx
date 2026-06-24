@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, CheckCircle } from "lucide-react";
-import { CAR_MAKES, CAR_MODELS_BY_MAKE } from "@/data/vehicles";
+import { CAR_MODELS_BY_MAKE } from "@/data/vehicles";
 import { getPartImage } from "@/data/vehicleImages";
 import VehicleCreative from "@/components/ui/VehicleCreative";
 import { postLead, API_BASE } from "@/lib/api";
@@ -24,11 +24,26 @@ export default function LeadFormSection({
   const [year,     setYear]     = useState("");
   const [partType, setPartType] = useState(defaultPartType ?? "");
 
+  // ── Dynamic makes loading from API ────────────────────────────────────────
+  const [apiMakes,     setApiMakes]     = useState<string[]>([]);
+  const [makesLoading, setMakesLoading] = useState(true);
+
+  useEffect(() => {
+    setMakesLoading(true);
+    fetch(`${API_BASE}/api/vehicles/makes/`)
+      .then(r => r.json())
+      .then((data: { id: number; name: string }[]) => {
+        setApiMakes(Array.isArray(data) && data.length > 0 ? data.map(m => m.name).sort() : []);
+      })
+      .catch(() => setApiMakes([]))
+      .finally(() => setMakesLoading(false));
+  }, []);
+
   // ── Dynamic model loading: API first, static fallback ─────────────────────
   const [apiModels,     setApiModels]     = useState<string[]>([]);
   const [modelsLoading, setModelsLoading] = useState(false);
 
-  // ── Dynamic year loading: API first, static fallback ─────────────────────
+  // ── Dynamic year loading: API first ───────────────────────────────────────
   const [apiYears,     setApiYears]     = useState<string[]>([]);
   const [yearsLoading, setYearsLoading] = useState(false);
 
@@ -56,9 +71,11 @@ export default function LeadFormSection({
       .finally(() => setYearsLoading(false));
   }, [make, model]);
 
-  // API models take priority; fall back to static data
+  // Makes: API-driven (all 56 from database), no static fallback needed
+  const makesList = apiMakes;
+  // Models: API first, static fallback for resilience
   const models    = apiModels.length > 0 ? apiModels : (make ? (CAR_MODELS_BY_MAKE[make] || []) : []);
-  // Year ONLY comes from API (database) — no static fallback, must depend on make+model
+  // Years: API only
   const yearsList = apiYears;
   const partImage = getPartImage(partSlug);
 
@@ -100,9 +117,9 @@ export default function LeadFormSection({
 
             <div>
               <label className="lead-label">Select Vehicle Make</label>
-              <select className="lead-select" value={make} onChange={e => { setMake(e.target.value); setModel(""); }}>
-                <option value="">Select Vehicle Make</option>
-                {CAR_MAKES.map(m => <option key={m} value={m}>{m}</option>)}
+              <select className="lead-select" value={make} onChange={e => { setMake(e.target.value); setModel(""); setYear(""); }} disabled={makesLoading}>
+                <option value="">{makesLoading ? "Loading makes…" : "Select Vehicle Make"}</option>
+                {makesList.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
             </div>
 
