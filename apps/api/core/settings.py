@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "vehicles",
     "parts",
     "leads",
+    "reviews",
 ]
 
 MIDDLEWARE = [
