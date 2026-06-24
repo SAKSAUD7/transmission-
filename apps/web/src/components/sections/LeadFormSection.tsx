@@ -1,11 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, CheckCircle } from "lucide-react";
-import { CAR_MODELS_BY_MAKE } from "@/data/vehicles";
 import { getPartImage } from "@/data/vehicleImages";
 import VehicleCreative from "@/components/ui/VehicleCreative";
-import { postLead, API_BASE } from "@/lib/api";
+import { postLead } from "@/lib/api";
 
 interface LeadFormProps {
   title: string;
@@ -19,67 +18,6 @@ interface LeadFormProps {
 export default function LeadFormSection({
   title, partTypeLabel, partTypeOptions, partSlug, sourcePage, defaultPartType,
 }: LeadFormProps) {
-  const [make,     setMake]     = useState("");
-  const [model,    setModel]    = useState("");
-  const [year,     setYear]     = useState("");
-  const [partType, setPartType] = useState(defaultPartType ?? "");
-
-  // ── Dynamic makes loading from API ────────────────────────────────────────
-  const [apiMakes,     setApiMakes]     = useState<string[]>([]);
-  const [makesLoading, setMakesLoading] = useState(true);
-
-  useEffect(() => {
-    setMakesLoading(true);
-    fetch(`${API_BASE}/api/vehicles/makes/`)
-      .then(r => r.json())
-      .then((data: { id: number; name: string }[]) => {
-        setApiMakes(Array.isArray(data) && data.length > 0 ? data.map(m => m.name).sort() : []);
-      })
-      .catch(() => setApiMakes([]))
-      .finally(() => setMakesLoading(false));
-  }, []);
-
-  // ── Dynamic model loading: API first, static fallback ─────────────────────
-  const [apiModels,     setApiModels]     = useState<string[]>([]);
-  const [modelsLoading, setModelsLoading] = useState(false);
-
-  // ── Dynamic year loading: API first ───────────────────────────────────────
-  const [apiYears,     setApiYears]     = useState<string[]>([]);
-  const [yearsLoading, setYearsLoading] = useState(false);
-
-  useEffect(() => {
-    if (!make) { setApiModels([]); return; }
-    setModelsLoading(true);
-    fetch(`${API_BASE}/api/vehicles/models/?make=${encodeURIComponent(make)}`)
-      .then(r => r.json())
-      .then((data: { id: number; name: string }[]) => {
-        setApiModels(Array.isArray(data) && data.length > 0 ? data.map(m => m.name) : []);
-      })
-      .catch(() => setApiModels([]))
-      .finally(() => setModelsLoading(false));
-  }, [make]);
-
-  useEffect(() => {
-    if (!make || !model) { setApiYears([]); return; }
-    setYearsLoading(true);
-    fetch(`${API_BASE}/api/vehicles/years/?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}`)
-      .then(r => r.json())
-      .then((data: string[]) => {
-        setApiYears(Array.isArray(data) && data.length > 0 ? data : []);
-      })
-      .catch(() => setApiYears([]))
-      .finally(() => setYearsLoading(false));
-  }, [make, model]);
-
-  // Makes: API-driven (all 56 from database), no static fallback needed
-  const makesList = apiMakes;
-  // Models: API first, static fallback for resilience
-  const models    = apiModels.length > 0 ? apiModels : (make ? (CAR_MODELS_BY_MAKE[make] || []) : []);
-  // Years: API only
-  const yearsList = apiYears;
-  const partImage = getPartImage(partSlug);
-
-
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ fullName: "", phone: "", email: "", zip: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -96,8 +34,8 @@ export default function LeadFormSection({
       const ok = await postLead({
         fullName: form.fullName, phone: form.phone,
         email: form.email, zip: form.zip,
-        carMake: make, carModel: model, carYear: year,
-        partSlug, partType: partType || partSlug, sourcePage,
+        carMake: "", carModel: "", carYear: "",
+        partSlug, partType: defaultPartType || partSlug, sourcePage,
       });
       setStatus(ok ? "success" : "error");
     } catch {
@@ -113,59 +51,12 @@ export default function LeadFormSection({
         <div className="lead-card">
           {/* LEFT — vehicle selectors */}
           <div className="lead-form-col">
-            <p className="lead-hint">Select your vehicle to find the right part — then get a free quote instantly.</p>
-
-            <div>
-              <label className="lead-label">Select Vehicle Make</label>
-              <select className="lead-select" value={make} onChange={e => { setMake(e.target.value); setModel(""); setYear(""); }} disabled={makesLoading}>
-                <option value="">{makesLoading ? "Loading makes…" : "Select Vehicle Make"}</option>
-                {makesList.map(m => <option key={m} value={m}>{m}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className="lead-label">Select Vehicle Model</label>
-              <select
-                className="lead-select"
-                value={model}
-                onChange={e => setModel(e.target.value)}
-                disabled={!make || modelsLoading}
-              >
-                <option value="">
-                  {modelsLoading ? "Loading models…" : "Select Vehicle Model"}
-                </option>
-                {models.map(m => <option key={m} value={m}>{m}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className="lead-label">Select Vehicle Year</label>
-              <select 
-                className="lead-select" 
-                value={year} 
-                onChange={e => setYear(e.target.value)}
-                disabled={!model || yearsLoading}
-              >
-                <option value="">
-                  {yearsLoading ? "Loading years…" : "Select Vehicle Year"}
-                </option>
-                {yearsList.map(y => <option key={y} value={y}>{y}</option>)}
-              </select>
-            </div>
-
-            <div>
-              <label className="lead-label">{partTypeLabel}</label>
-              <select className="lead-select" value={partType} onChange={e => setPartType(e.target.value)}>
-                <option value="">{partTypeLabel}</option>
-                {partTypeOptions.map(o => <option key={o} value={o}>{o}</option>)}
-              </select>
-            </div>
-
+            <p className="lead-hint">Get a free quote instantly. Our experts will help you find the exact part you need.</p>
             <button className="lead-btn" onClick={openModal}>Get My Part</button>
           </div>
 
           {/* RIGHT — 360° vehicle creative */}
-          <VehicleCreative make={make} model={model} year={year} partType={partType} partSlug={partSlug} partImage={partImage} />
+          <VehicleCreative make="" model="" year="" partType={defaultPartType || partSlug} partSlug={partSlug} partImage={getPartImage(partSlug)} />
         </div>
       </div>
 
@@ -220,12 +111,6 @@ export default function LeadFormSection({
                   ) : (
                     <>
                       <h2 className="modal-title">Please Enter Your Contact Details</h2>
-
-                      {(make || model || year) && (
-                        <div className="modal-vehicle-tag">
-                          🚗 {[make, model, year].filter(Boolean).join(" · ")}
-                        </div>
-                      )}
 
                       <form className="modal-form" onSubmit={handleSubmit}>
                         <div>

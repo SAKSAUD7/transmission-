@@ -135,9 +135,7 @@ function WriteReviewModal({
           <div className="rev-modal-row">
             <div className="rev-modal-field">
               <label className="rev-modal-label">Part Type</label>
-              <select className="rev-modal-select" value={form.partType} onChange={set("partType")}>
-                {TYPE_OPTIONS.filter(t => t !== "All Types").map(t => <option key={t}>{t}</option>)}
-              </select>
+              <input className="rev-modal-input" disabled value={form.partType} />
             </div>
             <div className="rev-modal-field">
               <label className="rev-modal-label">Rating *</label>
@@ -205,30 +203,22 @@ function WriteReviewModal({
 export default function ReviewsSection({ partName = "Transmission" }: ReviewsSectionProps) {
   const [reviews, setReviews]     = useState<Review[]>([]);
   const [loading, setLoading]     = useState(true);
-  const [typeFilter, setType]     = useState("All Types");
-  const [ratingFilter, setRating] = useState("All Ratings");
-  const [lovedFilter, setLoved]   = useState("Loved the most");
   const [showModal, setShowModal] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(5);
 
-  // Fetch approved reviews from Django API
+  // Fetch approved reviews from Django API specifically for this part category
   const loadReviews = () => {
     setLoading(true);
-    fetch(`${API_BASE}/api/reviews/`)
+    fetch(`${API_BASE}/api/reviews/?type=${encodeURIComponent(partName)}`)
       .then(r => r.json())
       .then((data: Review[]) => setReviews(Array.isArray(data) ? data : []))
       .catch(() => setReviews([]))
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { loadReviews(); }, []);
+  useEffect(() => { loadReviews(); }, [partName]);
 
-  /* ── filtering ── */
-  const filtered = reviews.filter(r => {
-    const typeOk   = typeFilter   === "All Types"      || r.partType === typeFilter;
-    const ratingOk = ratingFilter === "All Ratings"    || r.rating === Number(ratingFilter[0]);
-    const lovedOk  = lovedFilter  === "Loved the most" || r.lovedMost.some(l => l.toLowerCase().includes(lovedFilter.toLowerCase()));
-    return typeOk && ratingOk && lovedOk;
-  });
+  const visibleReviews = reviews.slice(0, visibleCount);
 
   return (
     <section id="reviews" className="rev-section">
@@ -242,24 +232,8 @@ export default function ReviewsSection({ partName = "Transmission" }: ReviewsSec
 
       <div className="rev-inner">
         {/* Header */}
-        <h2 className="rev-heading">Real Experiences, Real Satisfaction</h2>
-
-        {/* Filter bar */}
-        <div className="rev-filters">
-          <div className="rev-filter-left">
-            <select id="rev-filter-type" className="rev-filter-select" value={typeFilter} onChange={e => setType(e.target.value)} aria-label="Filter by type">
-              {TYPE_OPTIONS.map(t => <option key={t}>{t}</option>)}
-            </select>
-
-            <select id="rev-filter-rating" className="rev-filter-select" value={ratingFilter} onChange={e => setRating(e.target.value)} aria-label="Filter by rating">
-              {RATING_OPTIONS.map(r => <option key={r}>{r}</option>)}
-            </select>
-
-            <select id="rev-filter-loved" className="rev-filter-select" value={lovedFilter} onChange={e => setLoved(e.target.value)} aria-label="Filter by loved the most">
-              {LOVED_OPTIONS.map(l => <option key={l}>{l}</option>)}
-            </select>
-          </div>
-
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "16px", marginBottom: "32px" }}>
+          <h2 className="rev-heading" style={{ marginBottom: 0 }}>Real Experiences, Real Satisfaction</h2>
           <button id="rev-write-btn" className="rev-write-btn" onClick={() => setShowModal(true)}>
             Write a review
           </button>
@@ -268,21 +242,16 @@ export default function ReviewsSection({ partName = "Transmission" }: ReviewsSec
         {/* Review list */}
         <div className="rev-list" role="list">
           {loading && (
-            <p className="rev-empty">Loading reviews…</p>
+            <p className="rev-empty">Loading {partName} reviews…</p>
           )}
 
-          {!loading && filtered.length === 0 && (
+          {!loading && reviews.length === 0 && (
             <p className="rev-empty">
-              No reviews yet.{" "}
-              {(typeFilter !== "All Types" || ratingFilter !== "All Ratings" || lovedFilter !== "Loved the most") && (
-                <button className="rev-reset-link" onClick={() => { setType("All Types"); setRating("All Ratings"); setLoved("Loved the most"); }}>
-                  Reset filters
-                </button>
-              )}
+              No reviews yet for {partName}. Be the first to share your experience!
             </p>
           )}
 
-          {!loading && filtered.map((r, idx) => (
+          {!loading && visibleReviews.map((r, idx) => (
             <div key={r.id} className="rev-row" role="listitem">
               {/* Col 1 – Reviewer */}
               <div className="rev-col-who">
@@ -310,9 +279,21 @@ export default function ReviewsSection({ partName = "Transmission" }: ReviewsSec
                 </ul>
               </div>
 
-              {idx < filtered.length - 1 && <div className="rev-divider" />}
+              {idx < visibleReviews.length - 1 && <div className="rev-divider" />}
             </div>
           ))}
+
+          {!loading && reviews.length > visibleReviews.length && (
+            <div style={{ textAlign: "center", marginTop: "32px" }}>
+              <button 
+                className="rev-write-btn" 
+                style={{ background: "#f3f4f6", color: "#111827" }} 
+                onClick={() => setVisibleCount(c => c + 5)}
+              >
+                Load More Reviews
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>
